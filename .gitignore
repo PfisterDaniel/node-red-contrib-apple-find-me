@@ -1,3 +1,5 @@
-node_nodules/*
-node_nodules/
-node_nodules
+node_modules
+build
+npm-debug.log
+.env
+.DS_Store
