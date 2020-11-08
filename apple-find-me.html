@@ -1,26 +1,38 @@
 <script type="text/javascript">
     RED.nodes.registerType('apple-find-me',{
         category: 'function',
-        color: '#a6bbcf',
+        color: '#66ff00',
         defaults: {
             name: {value:""}
         },
+        credentials: {
+            username: {type:"text", required:true},
+            password: {type:"password", required:true},
+        },
         inputs:0,
         outputs:1,
-        icon: "",
+        icon: "apple.png",
         label: function() {
             return this.name||"Apple Find me";
         }
     });
 </script>
 
-<script type="text/x-red" data-template-name="charcount">
+<script type="text/x-red" data-template-name="apple-find-me">
     <div class="form-row">
         <label for="node-input-name"><i class="icon-tag"></i>Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
+    <div class="form-row">
+        <label for="node-input-username"><i class="fa fa-tag"></i> Username</label>
+        <input type="text" id="node-input-username">
+    </div>
+    <div class="form-row">
+        <label for="node-input-password"><i class="fa fa-tag"></i> Password</label>
+        <input type="password" id="node-input-password">
+    </div>
 </script>
 
-<type="text/x-red" data-help-name="charcount">
+<type="text/x-red" data-help-name="apple-find-me">
     <p>Beschreibung</p>
 </script>
