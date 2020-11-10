@@ -6,6 +6,8 @@ It work's without 2-Factor-Authentication (2FA) and retrive all connected device
 
 
 ## Installation
+[![NPM](https://nodei.co/npm/node-red-apple-find-me.png)](https://npmjs.org/package/node-red-apple-find-me)
+
 Install from your Node-RED Manage Palette
 
 or
@@ -41,7 +43,7 @@ Install using npm
 
 ## Features
   * Define places
-  * Retriev device metrics (ModelName, ModelImage, DeviceID, DisplayName, BatteryLevel)
+  * Retriev device metrics (ModelName, ModelImage, DeviceID, DisplayName, BatteryLevel, BatteryState)
   * Retriev location information (Latitude, Longitude, CurrentPlace, CurrentAddress, OSM-Url, GoogleMaps-Url)
 
 
@@ -64,6 +66,7 @@ Install using npm
              "deviceID":"<Unique DeviceID>",
              "displayName":"<DiviceName> e.g: Daniel's MacBook Pro",
              "batteryLevel":"<BatteryLevel in percent> e.g 53",
+             "batteryState":"<BatteryStatus> e.g: CHARGING",
              "locationInfo":{
                 "altitude":0,
                 "latitude":0.00000000000,
@@ -98,5 +101,12 @@ Install using npm
     }
  }
  ```
+## Changelog
+| Version | Description |
+| ------ | ----------- |
+| 1.0.0 | Initial Version |
+| 1.0.1 | Add BatteryStatus |
+
+
 ## Bugs and feature requests
 Please create an issue in [GitHub](https://github.com/PfisterDaniel/node-red-apple-find-me/issues)

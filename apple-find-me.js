@@ -96,6 +96,7 @@ module.exports = function(RED) {
                                         "deviceID": entry.id,
                                         "displayName": entry.name,
                                         "batteryLevel": Math.round(entry.batteryLevel * 100),
+                                        "batteryState": entry.batteryStatus,
                                         "locationInfo": null,
                                         "refreshTimeStamp":  moment(new Date()).tz('Europe/Berlin').format('YYYY-MM-DD HH:mm:ss'),
                                     };
@@ -145,6 +146,7 @@ module.exports = function(RED) {
                                         "deviceID": entry.id,
                                         "displayName": entry.name,
                                         "batteryLevel": Math.round(entry.batteryLevel * 100),
+                                        "batteryState": entry.batteryStatus,
                                         "locationInfo": {
                                             "altitude" : entry.location.altitude,
                                             "latitude" : entry.location.latitude,
