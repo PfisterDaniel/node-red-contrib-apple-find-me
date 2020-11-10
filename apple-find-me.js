@@ -13,19 +13,10 @@ module.exports = function(RED) {
         var node = this;
         this.repeat = config.triggerinterval;
         this.interval_id = null;
-        //var username = this.credentials.username;
-        //var password = this.credentials.password;
-
-  
 
         this.interval_id = setInterval( function() {
             node.emit("input",{});
         }, this.repeat );
-
-
-
-
-
 
         this.on('input', async function(msg) {
             //Check if Apple ID and Password is not empty
@@ -256,16 +247,13 @@ module.exports = function(RED) {
             }
         });
 
-
         this.on("close", function() {
             if (this.interval_id !== null) {
                 clearInterval(this.interval_id);
             }
         });
 
-        node.emit("input",{});
-        
-        
+        node.emit("input",{});        
     }
     
 
