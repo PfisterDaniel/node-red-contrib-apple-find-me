@@ -3,17 +3,112 @@
         category: 'function',
         color: '#66ff00',
         defaults: {
-            name: {value:""}
+            name: {value:""},
+            showfmly: {value:true},
+            triggerinterval:{value:"300000"},
+            useHereMapAPI: {value:false},
+            hereMapApiKey:{value:""},
+            places: {value:[{name: '', lat : '', lon : ''}],
+                validate:function(v) {
+                    var unique = new Set(v.map(function(o) {return o.name;}));
+                    return v.length == unique.size;
+                }},
         },
         credentials: {
-            username: {type:"text", required:true},
-            password: {type:"password", required:true},
+            appleid: {type:"text", required:true},
+            password: {type:"password", required:true}
         },
         inputs:0,
         outputs:1,
-        icon: "apple.png",
+        icon: "apple_w.png",
         label: function() {
             return this.name||"Apple Find me";
+        },
+        oneditprepare: function() {
+            if (this.showfmly === undefined) {
+                $("#node-input-showfmly").prop('checked', false);
+            }
+          
+            var un = new Set(this.places.map(function(o) {return o.name}));
+            if (this.places.length == un.size) { 
+                $("#valWarning").hide(); 
+            }else { 
+                $("#valWarning").show(); 
+            }
+
+            if(this.useHereMapAPI){
+                $("#HereMapAPIKey").show(); 
+            }else{
+                $("#HereMapAPIKey").hide(); 
+            }
+
+            $('#node-input-useHereMapAPI').change(function() {
+                if(this.checked) {
+                    $("#HereMapAPIKey").show();
+                }else{
+                    $("#HereMapAPIKey").hide(); 
+                }
+                       
+            });
+
+            function generatePlace(i, place) {
+                var container = $('<li/>',{style:"margin:0; padding:8px 0px 0px; border-bottom: 1px solid #ccc;"});
+                var row = $('<div/>').appendTo(container);
+                var row2 = $('<div/>',{style:"padding-top:5px; padding-left:175px;"}).appendTo(container);
+                var row3 = $('<div/>',{style:"padding-top:5px; padding-left:120px;"}).appendTo(container);
+
+                $('<i style="color:#eee; cursor:move; margin-left:3px;" class="node-input-place-handle fa fa-bars"></i>').appendTo(row);
+
+                var nameField = $('<input/>',{class:"node-input-place-name",type:"text",style:"margin-left:7px; width:calc(30% - 32px);", placeholder: 'Name',value:place.name}).appendTo(row);
+                var latField = $('<input/>',{class:"node-input-place-lat",type:"text",style:"margin-left:7px; width:calc(35% - 25px);", placeholder: 'Latitude', value:place.lat}).appendTo(row);
+                var lonField = $('<input/>',{class:"node-input-place-lon",type:"text",style:"margin-left:7px; width:calc(35% - 25px);", placeholder: 'Longitude', value:place.lon}).appendTo(row);
+
+                var finalspan = $('<span/>',{style:"float:right; margin-right:8px;"}).appendTo(row);
+                var deleteButton = $('<a/>',{href:"#",class:"editor-button editor-button-small", style:"margin-top:7px; margin-left:5px;"}).appendTo(finalspan);
+                $('<i/>',{class:"fa fa-remove"}).appendTo(deleteButton);
+
+                deleteButton.click(function() {
+                    container.css({"background":"#fee"});
+                    container.fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                });
+
+                $("#node-input-places-container").append(container);
+            }
+
+            $("#node-input-add-places").click(function() {
+                generatePlace($("#node-input-places-container").children().length+1, {});
+                $("#node-input-places-container-div").scrollTop($("#node-input-places-container-div").get(0).scrollHeight);
+            });
+
+            for (var i=0; i<this.places.length; i++) {
+                var place = this.places[i];
+                generatePlace(i+1,place);
+            }
+
+            $( "#node-input-places-container" ).sortable({
+                axis: "y",
+                handle:".node-input-place-handle",
+                cursor: "move"
+            });
+        },
+        oneditsave: function() {
+            var places = $("#node-input-places-container").children();
+            var node = this;
+            node.places = [];
+            places.each(function(i) {
+                var place = $(this);
+                var o = {
+                    name: place.find(".node-input-place-name").val(),
+                    lat: place.find(".node-input-place-lat").val(),
+                    lon: place.find(".node-input-place-lon").val()
+                };
+               
+                node.places.push(o);
+            });
+        },
+        oneditresize: function() {
         }
     });
 </script>
@@ -24,15 +119,48 @@
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
     <div class="form-row">
-        <label for="node-input-username"><i class="fa fa-tag"></i> Username</label>
-        <input type="text" id="node-input-username">
+        <label for="node-input-appleid"><i class="fa fa-tag"></i> Apple ID:</label>
+        <input type="text" id="node-input-appleid" placeholder="Apple ID">
     </div>
     <div class="form-row">
-        <label for="node-input-password"><i class="fa fa-tag"></i> Password</label>
+        <label for="node-input-password" ><i class="fa fa-tag"></i> Password:</label>
         <input type="password" id="node-input-password">
+    </div>
+    <div class="form-row">
+        <label for="node-input-showfmly" style="width:160px"><i class="fa fa-users"></i> Show Family Entries:</label>
+        <input type="checkbox" checked id="node-input-showfmly" style="display:inline-block; width:auto; vertical-align:top;">
+    </div>
+    <div class="form-row">
+        <label for="node-input-useHereMapAPI" style="width:160px"><i class="fa fa-map-signs"></i> Use HereMap-API:</label>
+        <input type="checkbox" id="node-input-useHereMapAPI" style="display:inline-block; width:auto; vertical-align:top;">
+    </div>
+    <div class="form-row" id="HereMapAPIKey">
+        <label for="node-input-hereMapApiKey" style="text-align:right;"><i class="fa fa-key"></i> API-Key:</label>
+        <input type="text" id="node-input-hereMapApiKey" placeholder="API-Key">
+    </div>
+    <div class="form-row">
+        <label for="node-input-triggerinterval"style="width:auto" ><i class="fa fa-clock-o"></i> Trigger Interval:</label>
+        <select id="node-input-triggerinterval" style="width:70%;">
+            <option value="60000">1 Minutes</option>
+            <option value="300000">5 Minutes</option>
+            <option value="600000">10 Minutes</option>
+            <option value="900000">15 Minutes</option>
+            <option value="1800000">30 Minutes</option>
+            <option value="3600000">60 Minutes</option>
+        </select>
+    </div>
+    <div class="form-row node-input-places-container-row" style="margin-bottom: 0px;width: 100%">
+        <label for="node-input-width" style="vertical-align:top"><i class="fa fa-map-marker"></i> Places</label>
+        <div id="node-input-places-container-div" style="box-sizing:border-box; border-radius:5px; height:257px; padding:5px; border:1px solid #ccc; overflow-y:scroll; display:inline-block; width:calc(70% + 15px);">
+            <span id="valWarning" style="color:#910000"><b>All Values must be unique.</b></span>
+            <ol id="node-input-places-container" style="list-style-type:none; margin:0;"></ol>
+        </div>
+    </div>
+    <div class="form-row">
+        <a href="#" class="editor-button editor-button-small" id="node-input-add-places" style="margin-top:4px; margin-left:103px;"><i class="fa fa-plus"></i> <span>Add Place</span></a>
     </div>
 </script>
 
 <type="text/x-red" data-help-name="apple-find-me">
-    <p>Beschreibung</p>
+    <p>Description</p>
 </script>
