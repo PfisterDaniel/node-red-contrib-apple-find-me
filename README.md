@@ -1,3 +1,7 @@
+
+[![Current Release](https://img.shields.io/github/v/release/PfisterDaniel/node-red-apple-find-me.svg?colorB=4cc61e)](https://github.com/PfisterDaniel/node-red-apple-find-me/releases/latest)
+
+
 # [node-red](https://github.com/PfisterDaniel/node-red-apple-find-me.git)-apple-find-me node
 This is a node-red node to get the current locations and other metrics of connected Apple devices.
 
@@ -16,6 +20,11 @@ Install using npm
 
     $ npm install node-red-apple-find-me
 
+Redmatic:
+
+    $ source /usr/local/addons/redmatic/home/.profile
+    $ /usr/local/addons/redmatic/var
+    $ npm install --save --no-package-lock --global-style --save-prefix="~" --production node-red-apple-find-me
 
 
 ## Emample:
