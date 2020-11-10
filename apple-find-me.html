@@ -1,6 +1,6 @@
 <script type="text/javascript">
     RED.nodes.registerType('apple-find-me',{
-        category: 'function',
+        category: 'mobile',
         color: '#66ff00',
         defaults: {
             name: {value:""},
@@ -82,10 +82,10 @@
                 $("#node-input-places-container-div").scrollTop($("#node-input-places-container-div").get(0).scrollHeight);
             });
 
-            for (var i=0; i<this.places.length; i++) {
+            /*for (var i=0; i<this.places.length; i++) {
                 var place = this.places[i];
                 generatePlace(i+1,place);
-            }
+            }*/
 
             $( "#node-input-places-container" ).sortable({
                 axis: "y",
@@ -124,7 +124,7 @@
     </div>
     <div class="form-row">
         <label for="node-input-password" ><i class="fa fa-tag"></i> Password:</label>
-        <input type="password" id="node-input-password">
+        <input type="password" id="node-input-password" placeholder="Password for Apple ID">
     </div>
     <div class="form-row">
         <label for="node-input-showfmly" style="width:160px"><i class="fa fa-users"></i> Show Family Entries:</label>

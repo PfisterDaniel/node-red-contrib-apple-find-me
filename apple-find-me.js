@@ -55,11 +55,11 @@ module.exports = function(RED) {
                 var RequestContent = {"clientContext": {"appVersion": "7.0", "fmly": "" + config.showfmly + ""} };
              
                 //Build Default Payload
-                msg.payload = {"requestHeader": RequestHeader, "requestContent": RequestContent, "triggerInterval": this.repeat, "appleid":this.credentials.appleid, "places": config.places, "response" : { "devices" : {}}};
+                msg.payload = {"places": config.places, "devices" : {}};
 
                 node.status({ fill: "blue", shape: "dot", text: "Fetching Devices..." });
 
-                //NEW
+               
 
                 var DeviceRequest = new Promise(rtn => {
                     urllib.request('https://fmipmobile.icloud.com/fmipservice/device/' + this.credentials.appleid + '/initClient', { 
@@ -178,7 +178,7 @@ module.exports = function(RED) {
                 var DeviceRequestResult = await DeviceRequest;
                 
                 if(DeviceRequestResult.status){
-                    msg.payload.response.devices = DeviceRequestResult.data;
+                    msg.payload.devices = DeviceRequestResult.data;
                     var DeviceCounter = 0;
                     for (var prop in DeviceRequestResult.data) {
                         DeviceCounter += DeviceRequestResult.data[prop].length;
@@ -186,15 +186,15 @@ module.exports = function(RED) {
                     node.status({ fill: "green", shape: "dot", text: DeviceCounter + " Devices found" });
 
                     try{
-                    for (var item in msg.payload.response.devices) {
-                        for (var device in msg.payload.response.devices[item]) {
-                            if (msg.payload.response.devices[item][device].locationInfo === undefined || msg.payload.response.devices[item][device].locationInfo === null){
+                    for (var item in msg.payload.devices) {
+                        for (var device in msg.payload.devices[item]) {
+                            if (msg.payload.devices[item][device].locationInfo === undefined || msg.payload.devices[item][device].locationInfo === null){
                                 continue;
                             }else{
 
                                 //Build Address-Crawl URL's
-                                var AdressCheckUrlOSM = "https://nominatim.openstreetmap.org/reverse?format=json&accept-language=de-DE&lat="+msg.payload.response.devices[item][device].locationInfo.latitude+"&lon="+msg.payload.response.devices[item][device].locationInfo.longitude+"&zoom=18&addressdetails=1";
-                                var AddressCheckUrlHereMap = "https://revgeocode.search.hereapi.com/v1/revgeocode?at=" + msg.payload.response.devices[item][device].locationInfo.latitude.toFixed(6) + "," + msg.payload.response.devices[item][device].locationInfo.longitude.toFixed(6)  + "&apiKey=" + config.hereMapApiKey;
+                                var AdressCheckUrlOSM = "https://nominatim.openstreetmap.org/reverse?format=json&accept-language=de-DE&lat="+msg.payload.devices[item][device].locationInfo.latitude+"&lon="+msg.payload.devices[item][device].locationInfo.longitude+"&zoom=18&addressdetails=1";
+                                var AddressCheckUrlHereMap = "https://revgeocode.search.hereapi.com/v1/revgeocode?at=" + msg.payload.devices[item][device].locationInfo.latitude.toFixed(6) + "," + msg.payload.devices[item][device].locationInfo.longitude.toFixed(6)  + "&apiKey=" + config.hereMapApiKey;
 
                                 var crawledAddress = new Promise(rtn => {
                                     if(config.useHereMapAPI){
@@ -226,7 +226,7 @@ module.exports = function(RED) {
                                 })
 
 
-                                msg.payload.response.devices[item][device].locationInfo.currentAddress = await crawledAddress;
+                                msg.payload.devices[item][device].locationInfo.currentAddress = await crawledAddress;
                             }
                         };
                     }
@@ -248,145 +248,6 @@ module.exports = function(RED) {
                         node.emit("close",{});
                     }
                 }
-
-               
-                //Send Data
-                //node.send(msg);  
-                //END-NEW
-
-
-                /*urllib.request('https://fmipmobile.icloud.com/fmipservice/device/' + this.credentials.appleid + '/initClient', { 
-                    method: 'POST', 
-                    headers: RequestHeader, 
-                    rejectUnauthorized: false, 
-                    dataType: 'json', 
-                    content: JSON.stringify(RequestContent)
-                }, function (err, data, res) {
-                    if (!err && res.statusCode == 200){
-                        
-                        data.content.forEach(function(entry) {
-                            msg.payload.response.devices[entry.modelDisplayName] = [];
-                        });
-
-                        try {
-                            data.content.forEach(function(entry) { 
-                                var DevColor = "";
-                                if(!entry.deviceColor && entry.deviceColor != "" && entry.deviceColor != undefined ){
-                                    DevColor = "-" + entry.deviceColor;
-                                }
-                                //Build Image URL
-                                var deviceImageUrl = 'https://statici.icloud.com/fmipmobile/deviceImages-9.0/' + entry.deviceClass + '/' + entry.rawDeviceModel + DevColor + '/online-infobox.png';
-                            
-                                if (entry.location === undefined || entry.location === null) 
-                                {
-                                    //Entry has no Location Information
-                                    var NewObj = {  
-                                        "modelName": entry.deviceDisplayName,
-                                        "modelImageLink": deviceImageUrl,
-                                        "deviceID": entry.id,
-                                        "displayName": entry.name,
-                                        "batteryLevel": Math.round(entry.batteryLevel * 100),
-                                        "locationInfo": null,
-                                        "refreshTimeStamp":  moment(new Date()).tz('Europe/Berlin').format('YYYY-MM-DD HH:mm:ss'),
-                                    };
-                                    msg.payload.response.devices[entry.modelDisplayName].push(NewObj);
-
-                                }
-                                else
-                                {
-                                    var CurrentPlace = "";
-                                    //Check if Locations are set
-                                    if(config.places.length > 0)
-                                    {
-                                        var LocationsWithDistance = [];
-                                        var currentLocation = new GeoPoint(entry.location.latitude, entry.location.longitude);
-
-                                        for (var i = 0; i < config.places.length; i++) 
-                                        {
-                                            var distanceObj = {
-                                                "name": config.places[i].name,
-                                                "distance": 0
-                                            }
-                                            var LocationCoordinates = new GeoPoint(parseFloat(config.places[i].lat), parseFloat(config.places[i].lon));
-                                            distanceObj.distance = parseInt((currentLocation.distanceTo(LocationCoordinates, true) * 1000).toString().split(".")[0]);
-                                            LocationsWithDistance.push(distanceObj);
-                                        }
-
-                                        const smallestDistanceValue = LocationsWithDistance.reduce((acc, loc) => acc.distance < loc.distance ? acc : loc);
-                                        if(smallestDistanceValue.distance < 150)
-                                        {
-                                            CurrentPlace = smallestDistanceValue.name;
-                                        }
-                                        else
-                                        {
-                                            CurrentPlace = "UNKNOWN";
-                                        }
-                                    }else{
-                                        CurrentPlace = "<NO PLACES DEFINDED>";
-                                    }
-
-                                    //Build Maps URL's
-                                    var OSMUrl = "https://www.openstreetmap.org/index.html?lat="+entry.location.latitude+"&lon="+entry.location.longitude+"&mlat="+entry.location.latitude+"&mlon="+entry.location.longitude+"&zoom=15&layers=M";
-                                    var GoogleMapsUrl = "https://www.google.com/maps/place/"+entry.location.latitude+"+"+entry.location.longitude+"/@"+entry.location.latitude+","+entry.location.longitude+",15z";
-
-                                    //Build Address-Crawl URL's
-                                    //var AdressCheckUrlOSM = "https://nominatim.openstreetmap.org/reverse?format=json&accept-language=de-DE&lat="+entry.location.latitude+"&lon="+entry.location.longitude+"&zoom=18&addressdetails=1";
-                                    //var AddressCheckUrlHereMap = "http://dev.virtualearth.net/REST/v1/Locations/" + entry.location.latitude.toFixed(6) + "," + entry.location.longitude.toFixed(6)  + "?incl=ciso2&inclnb=1&key=" + config.hereMapApiKey;
-                                    
-                                    
-                                    
-                                    var NewDeviceObject = {  
-                                            "modelName": entry.deviceDisplayName,
-                                            "modelImageLink": deviceImageUrl,
-                                            "deviceID": entry.id,
-                                            "displayName": entry.name,
-                                            "batteryLevel": Math.round(entry.batteryLevel * 100),
-                                            "locationInfo": {
-                                                "altitude" : entry.location.altitude,
-                                                "latitude" : entry.location.latitude,
-                                                "longitude" : entry.location.longitude,
-                                                "isInaccurate" : entry.location.isInaccurate,
-                                                "isOld" : entry.location.isOld,
-                                                "positionType" : entry.location.positionType,
-                                                "horizontalAccuracy" : entry.location.horizontalAccuracy,
-                                                "verticalAccuracy" : entry.location.verticalAccuracy,
-                                                "currentPlace": CurrentPlace,
-                                                "osmUrl" : OSMUrl,
-                                                "googleUrl": GoogleMapsUrl,
-                                                "locationTimeStamp" : moment(new Date(entry.location.timeStamp)).tz('Europe/Berlin').format('YYYY-MM-DD HH:mm')
-                                            },
-                                            "refreshTimeStamp":  moment(new Date()).tz('Europe/Berlin').format('YYYY-MM-DD HH:mm:ss'),
-                                    };
-                                    msg.payload.response.devices[entry.modelDisplayName].push(NewDeviceObject);
-                                }
-                            });
-
-                            node.status({ fill: "green", shape: "dot", text: "Request successfully" });
-                        }catch(e) {
-                            node.error(e);
-                            node.status({ fill: "red", shape: "dot", text: "Request failed" });
-                        }
-                    }
-                    else
-                    {
-                        //Ignore StatusCode -2
-                        if(res.statusCode == -2){
-                            msg.payload = {"statusCode": res.statusCode, "header": RequestHeader, "sendContent":requestContent, "response":{}};
-                            node.status({ fill: "yellow", shape: "dot", text: "Await next run" });
-                        }else if (res.statusCode == 401){
-                            msg.payload = {"statusCode": res.statusCode, "header": RequestHeader, "sendContent":requestContent, "response":{}};
-                            node.status({ fill: "red", shape: "dot", text: "Not authorised"});
-                            node.emit("close",{});
-                        }else{
-                            msg.payload = {"statusCode": res.statusCode, "header": RequestHeader, "sendContent":requestContent, "response":{}};
-                            node.status({ fill: "red", shape: "dot", text: "Status: " +  res.statusCode});
-                            node.emit("close",{});
-                        }
-                    }
-                    
-                    node.send(msg);  
-                });*/
-
             }
         });
 
