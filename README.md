@@ -3,6 +3,16 @@ This is a node-red node to get the current locations and other metrics of connec
 
 It work's without 2-Factor-Authentication (2FA) and retrive all connected devices include family devices.
 
+#### Installation
+Install from your Node-RED Manage Palette
+
+or
+
+Install using npm
+
+    $ npm install node-red-apple-find-me
+
+
 #### Emample:
 ![NodeExample](images/node.png)
 
@@ -16,8 +26,6 @@ It work's without 2-Factor-Authentication (2FA) and retrive all connected device
 | Use HereMap-API | Specifies whether the HereMap API is used to convert the coordinates into addresses. If true, an API key must be used. Otherwise the OpenStreetMap API is used. |
 | Trigger Interval | How often should the devices be updated |
 | Places | Define locations that should be specified in the payload if the device is within a 150 meter radius |
-
-
 
 
 
@@ -75,3 +83,5 @@ It work's without 2-Factor-Authentication (2FA) and retrive all connected device
     }
  }
  ```
+## Bugs and feature requests
+Please create an issue in [GitHub](https://github.com/PfisterDaniel/node-red-apple-find-me/issues)
