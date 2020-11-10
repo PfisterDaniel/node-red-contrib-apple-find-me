@@ -3,6 +3,8 @@ This is a node-red node to get the current locations and other metrics of connec
 
 It work's without 2-Factor-Authentication (2FA) and retrive all connected devices include family devices.
 
+
+
 #### Installation
 Install from your Node-RED Manage Palette
 
@@ -13,8 +15,11 @@ Install using npm
     $ npm install node-red-apple-find-me
 
 
+
+
 #### Emample:
 ![NodeExample](images/node.png)
+
 
 
 #### Parameter:
@@ -28,6 +33,17 @@ Install using npm
 | Places | Define locations that should be specified in the payload if the device is within a 150 meter radius |
 
 
+
+## How to use
+  * Add **Apple Find me** node your flow
+  * Setting Properties and enjoy
+
+
+
+## Features
+  * Define places
+  * Retriev device metrics (ModelName, ModelImage, DeviceID, DisplayName, BatteryLevel)
+  * Retriev location information (Latitude, Longitude, CurrentPlace, CurrentAddress, OSM-Url, GoogleMaps-Url)
 
 
 #### Example Payload:
