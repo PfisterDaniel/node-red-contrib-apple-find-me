@@ -115,7 +115,7 @@ Redmatic:
 | ------ | ----------- |
 | 1.0.0 | Initial Version |
 | 1.0.1 | Add BatteryStatus |
-
+| 1.0.2 | Nodes now available through the Node-Red palette |
 
 ## Bugs and feature requests
 Please create an issue in [GitHub](https://github.com/PfisterDaniel/node-red-apple-find-me/issues)
