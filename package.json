@@ -19,7 +19,8 @@
     "find",
     "me",
     "location",
-    "macbook"
+    "macbook",
+    "node-red"
   ],
   "author": "Daniel Pfister",
   "license": "MIT",
