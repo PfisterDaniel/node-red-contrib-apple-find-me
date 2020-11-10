@@ -82,10 +82,12 @@
                 $("#node-input-places-container-div").scrollTop($("#node-input-places-container-div").get(0).scrollHeight);
             });
 
-            /*for (var i=0; i<this.places.length; i++) {
+            for (var i=0; i<this.places.length; i++) {
                 var place = this.places[i];
-                generatePlace(i+1,place);
-            }*/
+                if(place.name != ""){
+                    generatePlace(i+1,place);
+                }
+            }
 
             $( "#node-input-places-container" ).sortable({
                 axis: "y",
