@@ -1,6 +1,6 @@
 {
   "name": "node-red-apple-find-me",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "This is a node-red node to get the current locations and other metrics of connected Apple devices",
   "main": "index.js",
   "scripts": {
