@@ -5,7 +5,7 @@ It work's without 2-Factor-Authentication (2FA) and retrive all connected device
 
 
 
-#### Installation
+## Installation
 Install from your Node-RED Manage Palette
 
 or
@@ -16,8 +16,7 @@ Install using npm
 
 
 
-
-#### Emample:
+## Emample:
 ![NodeExample](images/node.png)
 
 
@@ -46,7 +45,7 @@ Install using npm
   * Retriev location information (Latitude, Longitude, CurrentPlace, CurrentAddress, OSM-Url, GoogleMaps-Url)
 
 
-#### Example Payload:
+## Example Payload:
 ```yaml
 {
     "places":[
