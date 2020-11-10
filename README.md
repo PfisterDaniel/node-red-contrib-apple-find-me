@@ -4,7 +4,9 @@ This is a node-red node to get the current locations and other metrics of connec
 It work's without 2-Factor-Authentication (2FA) and retrive all connected devices include family devices.
 
 #### Emample:
-[![NodeExample](images/node.png)]
+![NodeExample](images/node.png)
+
+
 #### Parameter:
 | Parameter | Description |
 | ------ | ------ |
@@ -21,7 +23,7 @@ It work's without 2-Factor-Authentication (2FA) and retrive all connected device
 
 
 #### Example Payload:
-```
+```yaml
 {
     "places":[
        {

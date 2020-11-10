@@ -196,7 +196,9 @@ module.exports = function(RED) {
                                 var AdressCheckUrlOSM = "https://nominatim.openstreetmap.org/reverse?format=json&accept-language=de-DE&lat="+msg.payload.devices[item][device].locationInfo.latitude+"&lon="+msg.payload.devices[item][device].locationInfo.longitude+"&zoom=18&addressdetails=1";
                                 var AddressCheckUrlHereMap = "https://revgeocode.search.hereapi.com/v1/revgeocode?at=" + msg.payload.devices[item][device].locationInfo.latitude.toFixed(6) + "," + msg.payload.devices[item][device].locationInfo.longitude.toFixed(6)  + "&apiKey=" + config.hereMapApiKey;
 
+                                //Crawl Address in Sub-Request
                                 var crawledAddress = new Promise(rtn => {
+                                    //Using HereMapAPI
                                     if(config.useHereMapAPI){
                                         urllib.request(AddressCheckUrlHereMap, {
                                             method: 'GET',
@@ -212,6 +214,7 @@ module.exports = function(RED) {
                                             }
                                         });
                                     }else{
+                                        //Using OpenStreetMap-API
                                         urllib.request(AdressCheckUrlOSM, {
                                             method: 'GET',
                                             rejectUnauthorized: false,
@@ -224,14 +227,11 @@ module.exports = function(RED) {
                                         });
                                     }
                                 })
-
-
                                 msg.payload.devices[item][device].locationInfo.currentAddress = await crawledAddress;
                             }
                         };
                     }
                     }catch(e){
-                        node.err(e);
                         node.status({ fill: "red", shape: "dot", text:JSON.stringify(e) });
                     }
 
@@ -243,6 +243,9 @@ module.exports = function(RED) {
                     }else if (res.statusCode == 401){
                         node.status({ fill: "red", shape: "dot", text: "Not authorised"});
                         node.emit("close",{});
+                    }else if (res.statusCode == 404){
+                            node.status({ fill: "red", shape: "dot", text: "Page not found"});
+                            node.emit("close",{});
                     }else{
                         node.status({ fill: "red", shape: "dot", text: "ErrorCode: " +  res.statusCode});
                         node.emit("close",{});
