@@ -1,34 +1,204 @@
 <script type="text/javascript">
-    RED.nodes.registerType('apple-find-me',{
-        category: 'mobile',
+    RED.nodes.registerType('apple-find-me-account',{
+        category: 'config',
+        defaults: {
+            name: {value: ""},
+            showfmly: { value: true }
+        },
+        credentials: {
+            appleid: {type:"text"},
+            password: {type:"password"}
+        },
+        color: '#D3D3D3',
+        label: function() {
+            return this.name||"Apple Account";
+        },
+        oneditsave: function(){
+            console.log('save', this);
+        	var node = this;
+        	var appleid = $('#node-config-input-appleid').val();
+            var password = $('#node-config-input-password').val();
+            var showfmly = $('#node-config-input-showfmly').val();
+        	if (password != '_PWD_') {
+        		var account = {
+        			id: node.id,
+        			appleid: appleid,
+                    password: password,
+                    showfmly: showfmly 
+        		}
+        		$.ajax({
+        			data: JSON.stringify(account),
+        			url: 'apple-find-me-account/new-account',
+        			contentType: 'application/json',
+        			type: 'POST',
+        			processData: false
+        		});
+        	}
+        },
+        oneditprepare: function(){
+            console.log('prepare', this);
+            if (this.showfmly === undefined) {
+                $("#node-config-input-showfmly").prop('checked', false);
+            }
+        },
+        oneditsave: function() {
+			console.log('saved', this);
+		}
+    });
+</script>
+
+<script type="text/x-red" data-template-name="apple-find-me-account">
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="fa fa-tag"></i> Name:</label>
+        <input type="text" id="node-config-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-appleid"><i class="fa fa-tag"></i> Apple ID:</label>
+        <input type="text" id="node-config-input-appleid" placeholder="Apple ID">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-password" ><i class="fa fa-tag"></i> Password:</label>
+        <input type="password" id="node-config-input-password" placeholder="Password for Apple ID">
+    </div>
+    <hr>
+    <div class="form-row">
+        <label for="node-config-input-showfmly" style="width:160px"><i class="fa fa-users"></i> Show Family-Entries:</label>
+        <input type="checkbox" checked id="node-config-input-showfmly" style="display:inline-block; width:auto; vertical-align:top;">
+    </div>
+    <div class="form-tips">
+        <p><b>Info</b>: Family entries shows devices that you own in your family group as devices.">Click</a></p>
+    </div>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('apple-find-me-sendmessage',{
+        category: 'Mobile',
         color: '#66ff00',
         defaults: {
+            account: {value: "", type:"apple-find-me-account", required: true},
+            name: {value: ""},
+            deviceid:{ value: '', required: true, validate: RED.validators.typedInput('inputtype')},
+            playsound:{value: true},
+            subject:{value: 'Important Message'},
+            text: {value: "", required: true},
+            inputtype: { value: 'str' }
+            
+        },
+        inputs:1,
+        outputs:1,
+        icon: "apple_w.png",
+        paletteLabel: 'Send Message',
+        label: function() {
+            return this.name||"Apple Find me (Send Message)";
+        },
+        oneditprepare: function() {
+            $('#node-input-deviceid').typedInput({
+                default: 'str',
+                typeField: $("#node-input-inputtype"),
+                types: ['msg','str']
+            });
+        },
+        oneditsave: function() {},
+        oneditresize: function() {}
+    });
+</script>
+
+<script type="text/x-red" data-template-name="apple-find-me-sendmessage">
+    <div class="form-row">
+		<label for="node-input-account"><i class="fa fa-apple"></i> Account</label>
+		<input type="text" id="node-input-account">
+	</div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name:</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-deviceid"><i class="fa fa-sitemap"></i> Device-ID:</label>
+        <input type="text" id="node-input-deviceid" style="width:70%">
+        <input type="hidden" id="node-input-inputtype">
+      </div>
+    <div class="form-row">
+        <label for="node-input-text"><i class="fa fa-commenting"></i> Message:</label>
+        <input type="text" id="node-input-text" placeholder="Message Text">
+    </div>
+    <div class="form-row">
+        <label for="node-input-playsound" style="width:auto"><i class="fa fa-volume-up"></i> Play Sound:</label>
+        <input type="checkbox" id="node-input-playsound" style="display:inline-block; width:auto; vertical-align:top;">
+    </div>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('apple-find-me-playsound',{
+        category: 'Mobile',
+        color: '#66ff00',
+        defaults: {
+            account: {value: "", type:"apple-find-me-account", required: true},
             name: {value:""},
-            showfmly: {value:true},
-            triggerinterval:{value:"300000"},
-            useHereMapAPI: {value:false},
-            hereMapApiKey:{value:""},
+            deviceid:{ value: '', required: true, validate: RED.validators.typedInput('inputtype')},
+            subject:{value:'Alarm Message'},
+            inputtype: { value: 'str' }
+        },
+        inputs:1,
+        outputs:1,
+        icon: "apple_w.png",
+        paletteLabel: 'Find my Phone',
+        label: function() {
+            return this.name||"Apple Find me (Find my Phone)";
+        },
+        oneditprepare: function() {
+            $('#node-input-deviceid').typedInput({
+                default: 'str',
+                typeField: $("#node-input-inputtype"),
+                types: ['msg','str']
+            });
+        },
+        oneditsave: function() {},
+        oneditresize: function() {}
+    });
+</script>
+
+<script type="text/x-red" data-template-name="apple-find-me-playsound">
+    <div class="form-row">
+		<label for="node-input-account"><i class="fa fa-apple"></i> Account</label>
+		<input type="text" id="node-input-account">
+	</div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name:</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-deviceid"><i class="fa fa-sitemap"></i> Device-ID:</label>
+        <input type="text" id="node-input-deviceid" style="width:70%">
+        <input type="hidden" id="node-input-inputtype">
+      </div>
+</script>
+
+
+<script type="text/javascript">
+    RED.nodes.registerType('apple-find-me',{
+        category: 'Mobile',
+        color: '#66ff00',
+        defaults: {
+            account: {value: "", type:"apple-find-me-account", required: true},
+            name: {value:""},
+            triggerInterval: {value:"300000"},
+            geoAPI:{value:"OSM"},
+            hereMapApiKey: {value:""},
+            googleMapsApiKey: {value:""},
             places: {value:[{name: '', lat : '', lon : ''}],
                 validate:function(v) {
                     var unique = new Set(v.map(function(o) {return o.name;}));
                     return v.length == unique.size;
                 }},
         },
-        credentials: {
-            appleid: {type:"text", required:true},
-            password: {type:"password", required:true}
-        },
         inputs:0,
         outputs:1,
+        paletteLabel: 'Locate my Devices',
         icon: "apple_w.png",
         label: function() {
             return this.name||"Apple Find me";
         },
         oneditprepare: function() {
-            if (this.showfmly === undefined) {
-                $("#node-input-showfmly").prop('checked', false);
-            }
-          
             var un = new Set(this.places.map(function(o) {return o.name}));
             if (this.places.length == un.size) { 
                 $("#valWarning").hide(); 
@@ -36,17 +206,41 @@
                 $("#valWarning").show(); 
             }
 
-            if(this.useHereMapAPI){
+            if(this.geoAPI == "HERE"){
                 $("#HereMapAPIKey").show(); 
+                $("#HereTips").show();
+                $("#GoogleTips").hide();  
+                $("#GoogleMapsAPIKey").hide(); 
+
+            }else if(this.geoAPI == "GOOGLE"){
+                $("#HereMapAPIKey").hide();
+                $("#HereTips").hide();
+                $("#GoogleTips").show();  
+                $("#GoogleMapsAPIKey").show(); 
             }else{
                 $("#HereMapAPIKey").hide(); 
+                $("#GoogleMapsAPIKey").hide();
+                $("#HereTips").hide();
+                $("#GoogleTips").hide(); 
             }
 
-            $('#node-input-useHereMapAPI').change(function() {
-                if(this.checked) {
-                    $("#HereMapAPIKey").show();
+            $('#node-input-geoAPI').change(function() {
+                if(this.value == "HERE"){
+                    $("#HereMapAPIKey").show(); 
+                    $("#HereTips").show();
+                    $("#GoogleTips").hide();  
+                    $("#GoogleMapsAPIKey").hide(); 
+
+                }else if(this.value == "GOOGLE"){
+                    $("#HereMapAPIKey").hide();
+                    $("#HereTips").hide();
+                    $("#GoogleTips").show();  
+                    $("#GoogleMapsAPIKey").show(); 
                 }else{
                     $("#HereMapAPIKey").hide(); 
+                    $("#GoogleMapsAPIKey").hide();
+                    $("#HereTips").hide();
+                    $("#GoogleTips").hide(); 
                 }
                        
             });
@@ -115,34 +309,37 @@
     });
 </script>
 
+
 <script type="text/x-red" data-template-name="apple-find-me">
+    <div class="form-row">
+		<label for="node-input-account"><i class="icon-tag"></i> Account</label>
+		<input type="text" id="node-input-account">
+	</div>
     <div class="form-row">
         <label for="node-input-name"><i class="icon-tag"></i>Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
     <div class="form-row">
-        <label for="node-input-appleid"><i class="fa fa-tag"></i> Apple ID:</label>
-        <input type="text" id="node-input-appleid" placeholder="Apple ID">
-    </div>
-    <div class="form-row">
-        <label for="node-input-password" ><i class="fa fa-tag"></i> Password:</label>
-        <input type="password" id="node-input-password" placeholder="Password for Apple ID">
-    </div>
-    <div class="form-row">
-        <label for="node-input-showfmly" style="width:160px"><i class="fa fa-users"></i> Show Family Entries:</label>
-        <input type="checkbox" checked id="node-input-showfmly" style="display:inline-block; width:auto; vertical-align:top;">
-    </div>
-    <div class="form-row">
-        <label for="node-input-useHereMapAPI" style="width:160px"><i class="fa fa-map-signs"></i> Use HereMap-API:</label>
-        <input type="checkbox" id="node-input-useHereMapAPI" style="display:inline-block; width:auto; vertical-align:top;">
+        <label for="node-input-geoAPI"style="" ><i class="fa fa-map-signs"></i> Geo-API:</label>
+        <select id="node-input-geoAPI" style="width:70%;">
+            <option value="OSM">OpenStreetMap</option>
+            <option value="HERE">HereMaps</option>
+            <option value="GOOGLE">GoogleMaps</option>
+        </select>
     </div>
     <div class="form-row" id="HereMapAPIKey">
         <label for="node-input-hereMapApiKey" style="text-align:right;"><i class="fa fa-key"></i> API-Key:</label>
-        <input type="text" id="node-input-hereMapApiKey" placeholder="API-Key">
+        <input type="text" id="node-input-hereMapApiKey" placeholder="HereMaps API-Key">
     </div>
+
+    <div class="form-row" id="GoogleMapsAPIKey">
+        <label for="node-input-googleMapsApiKey" style="text-align:right;"><i class="fa fa-key"></i> API-Key:</label>
+        <input type="text" id="node-input-googleMapsApiKey" placeholder="GoogleMaps API-Key">
+    </div>
+
     <div class="form-row">
-        <label for="node-input-triggerinterval"style="width:auto" ><i class="fa fa-clock-o"></i> Trigger Interval:</label>
-        <select id="node-input-triggerinterval" style="width:70%;">
+        <label for="node-input-triggerInterval"style="width:auto" ><i class="fa fa-clock-o"></i> Trigger Interval:</label>
+        <select id="node-input-triggerInterval" style="width:70%;">
             <option value="60000">1 Minutes</option>
             <option value="300000">5 Minutes</option>
             <option value="600000">10 Minutes</option>
@@ -160,6 +357,13 @@
     </div>
     <div class="form-row">
         <a href="#" class="editor-button editor-button-small" id="node-input-add-places" style="margin-top:4px; margin-left:103px;"><i class="fa fa-plus"></i> <span>Add Place</span></a>
+    </div>
+    <br/>
+    <div class="form-tips" id="HereTips">
+        <p>You don't have an API KEY for HereMaps? Then you can create one here: <a href="https://developer.here.com/" target="_new">Click</a></p>
+    </div>
+    <div class="form-tips" id="GoogleTips">
+        <p>You don't have an API KEY for GoogleMaps? Then you can create one here: <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_new">Click</a></p>
     </div>
 </script>
 

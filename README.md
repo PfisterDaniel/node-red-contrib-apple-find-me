@@ -38,7 +38,7 @@ Redmatic:
 | AppleID | self explanatory |
 | Password | self explanatory |
 | Use Family Entrys | Shows devices of the family (true / false) |
-| Use HereMap-API | Specifies whether the HereMap API is used to convert the coordinates into addresses. If true, an API key must be used. Otherwise the OpenStreetMap API is used. |
+| Use Geo API | OpenStreetMaps, HereMaps or GoogleMaps (HereMaps and GoogleMaps needs an API-KEY) |
 | Trigger Interval | How often should the devices be updated |
 | Places | Define locations that should be specified in the payload if the device is within a 150 meter radius |
 
@@ -46,6 +46,7 @@ Redmatic:
 
 ## How to use
   * Add **Apple Find me** node your flow
+  * Create Account-Information
   * Setting Properties and enjoy
 
 
@@ -54,24 +55,17 @@ Redmatic:
   * Define places
   * Retriev device metrics (ModelName, ModelImage, DeviceID, DisplayName, BatteryLevel, BatteryState)
   * Retriev location information (Latitude, Longitude, CurrentPlace, CurrentAddress, OSM-Url, GoogleMaps-Url)
+  * Run Find my iPhone
+  * Send Message to an iOS Device
 
 
-## Example Payload:
+## Example Payload (Locate my Devices):
 ```yaml
 {
-    "places":[
-       {
-          "name":"HOME",
-          "lat":"<Latitude>",
-          "lon":"<Longitude>"
-       },
-       ....
-    ],
-    "devices":{
        "<ModelType> e.g: MacBook Pro or iPhone":[
           {
              "modelName":"<ModelName> e.g: MacBook Pro 13\"",
-             "modelImageLink":"<ModelImageLink> e.g: https://statici.icloud.com/fmipmobile/deviceImages-9.0/MacBookPro/MacBookPro11,1/online-infobox.png",
+             "modelImageLink":"<ModelImageLink>",
              "deviceID":"<Unique DeviceID>",
              "displayName":"<DiviceName> e.g: Daniel's MacBook Pro",
              "batteryLevel":"<BatteryLevel in percent> e.g 53",
@@ -82,24 +76,11 @@ Redmatic:
                 "longitude":0.00000000000,
                 "isInaccurate":false,
                 "isOld":false,
-                "positionType":"Wifi",
+                "positionType":"Wifi or GPS",
                 "horizontalAccuracy":"<Accuracy in meters> e.g: 65,
                 "verticalAccuracy":0,
                 "currentPlace":"<if device in place then its here the name of place when distance < 150 meters>",
-                "currentAddress":{
-                   "label":"...",
-                   "countryCode":"...",
-                   "countryName":"...",
-                   "stateCode":"...",
-                   "state":"...",
-                   "countyCode":"...",
-                   "county":"...",
-                   "city":"...",
-                   "district":"...",
-                   "street":"...",
-                   "postalCode":"....",
-                   "houseNumber":"..."
-                },
+                "currentAddress":{<Address-Object from OpenStreetMap, HereMap or GoogleMaps>},
                 "osmUrl":"<OpenStreetMaps Url>",
                 "googleUrl":"<GoogleMaps Url>",
                 "locationTimeStamp":"<TimeStamp of last location> e.g: 2020-11-10 14:51:12"
@@ -117,6 +98,7 @@ Redmatic:
 | 1.0.1 | Add BatteryStatus |
 | 1.0.2 | Nodes now available through the Node-Red palette |
 | 1.0.3 | Bug with Places solved |
+| 1.0.4 | Added Find my iPhone and send message, Geolocation GoogleMaps |
 
 ## Bugs and feature requests
 Please create an issue in [GitHub](https://github.com/PfisterDaniel/node-red-apple-find-me/issues)

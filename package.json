@@ -1,6 +1,6 @@
 {
   "name": "node-red-apple-find-me",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "This is a node-red node to get the current locations and other metrics of connected Apple devices",
   "main": "index.js",
   "scripts": {
@@ -36,6 +36,7 @@
   "dependencies": {
     "moment-timezone": "^0.5.31",
     "urllib": "^2.36.1",
-    "geopoint": "^1.0.1"
+    "geopoint": "^1.0.1",
+    "body-parser": "^1.19.0"
   }
 }
