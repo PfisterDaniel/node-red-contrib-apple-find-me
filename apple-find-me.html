@@ -10,6 +10,7 @@
             password: {type:"password"}
         },
         color: '#D3D3D3',
+        icon: "apple_w.png",
         label: function() {
             return this.name||"Apple Account";
         },
@@ -183,6 +184,7 @@
             name: {value:""},
             triggerInterval: {value:"300000"},
             geoAPI:{value:"OSM"},
+            distanceInMeter: {value:150, validate:RED.validators.number() },
             hereMapApiKey: {value:""},
             googleMapsApiKey: {value:""},
             places: {value:[{name: '', lat : '', lon : ''}],
@@ -329,12 +331,12 @@
     </div>
     <div class="form-row" id="HereMapAPIKey">
         <label for="node-input-hereMapApiKey" style="text-align:right;"><i class="fa fa-key"></i> API-Key:</label>
-        <input type="text" id="node-input-hereMapApiKey" placeholder="HereMaps API-Key">
+        <input type="password" id="node-input-hereMapApiKey" placeholder="HereMaps API-Key">
     </div>
 
     <div class="form-row" id="GoogleMapsAPIKey">
         <label for="node-input-googleMapsApiKey" style="text-align:right;"><i class="fa fa-key"></i> API-Key:</label>
-        <input type="text" id="node-input-googleMapsApiKey" placeholder="GoogleMaps API-Key">
+        <input type="password" id="node-input-googleMapsApiKey" placeholder="GoogleMaps API-Key">
     </div>
 
     <div class="form-row">
@@ -358,6 +360,10 @@
     <div class="form-row">
         <a href="#" class="editor-button editor-button-small" id="node-input-add-places" style="margin-top:4px; margin-left:103px;"><i class="fa fa-plus"></i> <span>Add Place</span></a>
     </div>
+    <div class="form-row">
+		<label for="node-input-distanceInMeter"><i class="fa fa-arrows"></i> Distance (Meters):</label>
+		<input type="text" id="node-input-distanceInMeter">
+	</div>
     <br/>
     <div class="form-tips" id="HereTips">
         <p>You don't have an API KEY for HereMaps? Then you can create one here: <a href="https://developer.here.com/" target="_new">Click</a></p>

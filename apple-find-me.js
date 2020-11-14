@@ -45,6 +45,7 @@ module.exports = function(RED) {
             { 
                 node.status({ fill: "red", shape: "dot", text: "A valid Apple ID is required" });
             }
+            //Checking if GeoAPI an API where need's a API-KEY
             else if(config.geoAPI == "HERE" && config.hereMapApiKey == "")
             {
                 node.status({ fill: "red", shape: "dot", text: "HereMap API-Key is required" });
@@ -110,7 +111,7 @@ module.exports = function(RED) {
                                 else
                                 {
                                     var CurrentPlace = "";
-                                    //Check if Locations are set
+                                    //Check if Places are set
                                     if(config.places.length > 0)
                                     {
                                         var LocationsWithDistance = [];
@@ -128,7 +129,7 @@ module.exports = function(RED) {
                                         }
 
                                         const smallestDistanceValue = LocationsWithDistance.reduce((acc, loc) => acc.distance < loc.distance ? acc : loc);
-                                        if(smallestDistanceValue.distance < 150)
+                                        if(smallestDistanceValue.distance < config.distanceInMeter)
                                         {
                                             CurrentPlace = smallestDistanceValue.name;
                                         }
