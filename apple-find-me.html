@@ -1,3 +1,4 @@
+<!-- Node apple-find-me-account -->
 <script type="text/javascript">
     RED.nodes.registerType('apple-find-me-account',{
         category: 'config',
@@ -67,10 +68,13 @@
         <input type="checkbox" checked id="node-config-input-showfmly" style="display:inline-block; width:auto; vertical-align:top;">
     </div>
     <div class="form-tips">
-        <p><b>Info</b>: Family entries shows devices that you own in your family group as devices.">Click</a></p>
+        <p><b>Info</b>: Family entries shows devices that you own in your family group as devices.</p>
     </div>
 </script>
 
+
+
+<!-- Node apple-find-me-sendmessage -->
 <script type="text/javascript">
     RED.nodes.registerType('apple-find-me-sendmessage',{
         category: 'Mobile',
@@ -128,6 +132,12 @@
     </div>
 </script>
 
+<script type="text/x-red" data-help-name="apple-find-me-sendmessage">
+    <p>Sends a message to an iOS-Device</p>
+</script>
+
+
+<!-- Node apple-find-me-playsound -->
 <script type="text/javascript">
     RED.nodes.registerType('apple-find-me-playsound',{
         category: 'Mobile',
@@ -174,7 +184,13 @@
       </div>
 </script>
 
+<script type="text/x-red" data-help-name="apple-find-me-playsound">
+    <p>Run Find my iPhone</p>
+</script>
 
+
+
+<!-- Node apple-find-me -->
 <script type="text/javascript">
     RED.nodes.registerType('apple-find-me',{
         category: 'Mobile',
@@ -311,7 +327,6 @@
     });
 </script>
 
-
 <script type="text/x-red" data-template-name="apple-find-me">
     <div class="form-row">
 		<label for="node-input-account"><i class="icon-tag"></i> Account</label>
@@ -373,6 +388,196 @@
     </div>
 </script>
 
-<type="text/x-red" data-help-name="apple-find-me">
-    <p>Description</p>
+<script type="text/x-red" data-help-name="apple-find-me">
+    <p>Finds all iOS devices in your Apple account and calls up the parameters based on the set interval.</p>
+</script>
+
+<!-- Node apple-find-me-with-payload -->
+<script type="text/javascript">
+    RED.nodes.registerType('apple-find-me-with-payload',{
+        category: 'Mobile',
+        color: '#66ff00',
+        defaults: {
+            account: {value: "", type:"apple-find-me-account", required: true},
+            name: {value:""},
+            geoAPI:{value:"OSM"},
+            distanceInMeter: {value:150, validate:RED.validators.number() },
+            hereMapApiKey: {value:""},
+            googleMapsApiKey: {value:""},
+            places: {value:[{name: '', lat : '', lon : ''}],
+                validate:function(v) {
+                    var unique = new Set(v.map(function(o) {return o.name;}));
+                    return v.length == unique.size;
+                }},
+        },
+        inputs:1,
+        outputs:1,
+        paletteLabel: 'Locate my Devices (run with Payload)',
+        icon: "apple_w.png",
+        label: function() {
+            return this.name||"Apple Find me";
+        },
+        oneditprepare: function() {
+            var un = new Set(this.places.map(function(o) {return o.name}));
+            if (this.places.length == un.size) { 
+                $("#valWarning").hide(); 
+            }else { 
+                $("#valWarning").show(); 
+            }
+
+            if(this.geoAPI == "HERE"){
+                $("#HereMapAPIKey").show(); 
+                $("#HereTips").show();
+                $("#GoogleTips").hide();  
+                $("#GoogleMapsAPIKey").hide(); 
+
+            }else if(this.geoAPI == "GOOGLE"){
+                $("#HereMapAPIKey").hide();
+                $("#HereTips").hide();
+                $("#GoogleTips").show();  
+                $("#GoogleMapsAPIKey").show(); 
+            }else{
+                $("#HereMapAPIKey").hide(); 
+                $("#GoogleMapsAPIKey").hide();
+                $("#HereTips").hide();
+                $("#GoogleTips").hide(); 
+            }
+
+            $('#node-input-geoAPI').change(function() {
+                if(this.value == "HERE"){
+                    $("#HereMapAPIKey").show(); 
+                    $("#HereTips").show();
+                    $("#GoogleTips").hide();  
+                    $("#GoogleMapsAPIKey").hide(); 
+
+                }else if(this.value == "GOOGLE"){
+                    $("#HereMapAPIKey").hide();
+                    $("#HereTips").hide();
+                    $("#GoogleTips").show();  
+                    $("#GoogleMapsAPIKey").show(); 
+                }else{
+                    $("#HereMapAPIKey").hide(); 
+                    $("#GoogleMapsAPIKey").hide();
+                    $("#HereTips").hide();
+                    $("#GoogleTips").hide(); 
+                }
+                       
+            });
+
+            function generatePlace(i, place) {
+                var container = $('<li/>',{style:"margin:0; padding:8px 0px 0px; border-bottom: 1px solid #ccc;"});
+                var row = $('<div/>').appendTo(container);
+                var row2 = $('<div/>',{style:"padding-top:5px; padding-left:175px;"}).appendTo(container);
+                var row3 = $('<div/>',{style:"padding-top:5px; padding-left:120px;"}).appendTo(container);
+
+                $('<i style="color:#eee; cursor:move; margin-left:3px;" class="node-input-place-handle fa fa-bars"></i>').appendTo(row);
+
+                var nameField = $('<input/>',{class:"node-input-place-name",type:"text",style:"margin-left:7px; width:calc(30% - 32px);", placeholder: 'Name',value:place.name}).appendTo(row);
+                var latField = $('<input/>',{class:"node-input-place-lat",type:"text",style:"margin-left:7px; width:calc(35% - 25px);", placeholder: 'Latitude', value:place.lat}).appendTo(row);
+                var lonField = $('<input/>',{class:"node-input-place-lon",type:"text",style:"margin-left:7px; width:calc(35% - 25px);", placeholder: 'Longitude', value:place.lon}).appendTo(row);
+
+                var finalspan = $('<span/>',{style:"float:right; margin-right:8px;"}).appendTo(row);
+                var deleteButton = $('<a/>',{href:"#",class:"editor-button editor-button-small", style:"margin-top:7px; margin-left:5px;"}).appendTo(finalspan);
+                $('<i/>',{class:"fa fa-remove"}).appendTo(deleteButton);
+
+                deleteButton.click(function() {
+                    container.css({"background":"#fee"});
+                    container.fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                });
+
+                $("#node-input-places-container").append(container);
+            }
+
+            $("#node-input-add-places").click(function() {
+                generatePlace($("#node-input-places-container").children().length+1, {});
+                $("#node-input-places-container-div").scrollTop($("#node-input-places-container-div").get(0).scrollHeight);
+            });
+
+            for (var i=0; i<this.places.length; i++) {
+                var place = this.places[i];
+                if(place.name != ""){
+                    generatePlace(i+1,place);
+                }
+            }
+
+            $( "#node-input-places-container" ).sortable({
+                axis: "y",
+                handle:".node-input-place-handle",
+                cursor: "move"
+            });
+        },
+        oneditsave: function() {
+            var places = $("#node-input-places-container").children();
+            var node = this;
+            node.places = [];
+            places.each(function(i) {
+                var place = $(this);
+                var o = {
+                    name: place.find(".node-input-place-name").val(),
+                    lat: place.find(".node-input-place-lat").val(),
+                    lon: place.find(".node-input-place-lon").val()
+                };
+               
+                node.places.push(o);
+            });
+        },
+        oneditresize: function() {
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="apple-find-me-with-payload">
+    <div class="form-row">
+		<label for="node-input-account"><i class="icon-tag"></i> Account</label>
+		<input type="text" id="node-input-account">
+	</div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i>Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-geoAPI"style="" ><i class="fa fa-map-signs"></i> Geo-API:</label>
+        <select id="node-input-geoAPI" style="width:70%;">
+            <option value="OSM">OpenStreetMap</option>
+            <option value="HERE">HereMaps</option>
+            <option value="GOOGLE">GoogleMaps</option>
+        </select>
+    </div>
+    <div class="form-row" id="HereMapAPIKey">
+        <label for="node-input-hereMapApiKey" style="text-align:right;"><i class="fa fa-key"></i> API-Key:</label>
+        <input type="password" id="node-input-hereMapApiKey" placeholder="HereMaps API-Key">
+    </div>
+
+    <div class="form-row" id="GoogleMapsAPIKey">
+        <label for="node-input-googleMapsApiKey" style="text-align:right;"><i class="fa fa-key"></i> API-Key:</label>
+        <input type="password" id="node-input-googleMapsApiKey" placeholder="GoogleMaps API-Key">
+    </div>
+
+    <div class="form-row node-input-places-container-row" style="margin-bottom: 0px;width: 100%">
+        <label for="node-input-width" style="vertical-align:top"><i class="fa fa-map-marker"></i> Places</label>
+        <div id="node-input-places-container-div" style="box-sizing:border-box; border-radius:5px; height:257px; padding:5px; border:1px solid #ccc; overflow-y:scroll; display:inline-block; width:calc(70% + 15px);">
+            <span id="valWarning" style="color:#910000"><b>All Values must be unique.</b></span>
+            <ol id="node-input-places-container" style="list-style-type:none; margin:0;"></ol>
+        </div>
+    </div>
+    <div class="form-row">
+        <a href="#" class="editor-button editor-button-small" id="node-input-add-places" style="margin-top:4px; margin-left:103px;"><i class="fa fa-plus"></i> <span>Add Place</span></a>
+    </div>
+    <div class="form-row">
+		<label for="node-input-distanceInMeter"><i class="fa fa-arrows"></i> Distance (Meters):</label>
+		<input type="text" id="node-input-distanceInMeter">
+	</div>
+    <br/>
+    <div class="form-tips" id="HereTips">
+        <p>You don't have an API KEY for HereMaps? Then you can create one here: <a href="https://developer.here.com/" target="_new">Click</a></p>
+    </div>
+    <div class="form-tips" id="GoogleTips">
+        <p>You don't have an API KEY for GoogleMaps? Then you can create one here: <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_new">Click</a></p>
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="apple-find-me-with-payload">
+    <p>Finds all iOS devices in your Apple account and only calls up the parameters if there is an input.</p>
 </script>
