@@ -136,7 +136,7 @@ Redmatic:
 | 1.0.3 | Bug with Places solved |
 | 1.0.4 | Added Find my iPhone and send message, Geolocation GoogleMaps |
 | 1.0.5 | Added new Node (apple-find-me-with-payload), API-Key now a Password-Fields |
-|       | Added Descriptions, |
+|       | Added Descriptions |
 
 ## Bugs and feature requests
 Please create an issue in [GitHub](https://github.com/PfisterDaniel/node-red-apple-find-me/issues)
