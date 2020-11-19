@@ -31,7 +31,7 @@ Redmatic:
 ![Nodes](images/nodes.png)
 
 ## Examples:
-![NodeExample](images/nodes_examples.png)
+![NodeExample](images/node_examples.png)
 
 
 #### Parameter (Account):
