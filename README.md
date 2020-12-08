@@ -2,7 +2,7 @@
 [![Current Release](https://img.shields.io/github/v/release/PfisterDaniel/node-red-apple-find-me.svg?colorB=4cc61e)](https://github.com/PfisterDaniel/node-red-apple-find-me/releases/latest)
 
 
-# [node-red](https://github.com/PfisterDaniel/node-red-apple-find-me.git)-apple-find-me node
+# [node-red](http://nodered.org)-apple-find-me node
 This is a node-red node to get the current locations and other metrics of connected Apple devices.
 
 It work's without 2-Factor-Authentication (2FA) and retrive all connected devices include family devices.
@@ -23,7 +23,7 @@ Install using npm
 Redmatic:
 
     $ source /usr/local/addons/redmatic/home/.profile
-    $ /usr/local/addons/redmatic/var
+    $ cd /usr/local/addons/redmatic/var
     $ npm install --save --no-package-lock --global-style --save-prefix="~" --production node-red-apple-find-me
 
 
