@@ -1,4 +1,4 @@
-# [node-red](http://nodered.org)-contrib-apple-find-me node
+# [node-red](http://nodered.org)-contrib-apple-find-me
 This is a node-red node to get the current locations and other metrics of connected Apple devices.
 
 It work's without 2-Factor-Authentication (2FA) and retrive all connected devices include family devices.
