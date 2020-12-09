@@ -1,5 +1,5 @@
 {
-  "name": "node-red-apple-find-me",
+  "name": "node-red-contrib-apple-find-me",
   "version": "1.0.5",
   "description": "This is a node-red node to get the current locations and other metrics of connected Apple devices",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PfisterDaniel/node-red-apple-find-me.git"
+    "url": "git+https://github.com/PfisterDaniel/node-red-contrib-apple-find-me.git"
   },
   "keywords": [
     "apple",
@@ -23,16 +23,17 @@
     "node-red"
   ],
   "author": "Daniel Pfister",
+  "email" : "kontakt@daniel-pfister.de",
   "license": "MIT",
   "node-red": {
     "nodes": {
-      "apple-find-me": "apple-find-me.js"
+      "apple-find-me": "nodes/apple-find-me.js"
     }
   },
   "bugs": {
-    "url": "https://github.com/PfisterDaniel/node-red-apple-find-me/issues"
+    "url": "https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues"
   },
-  "homepage": "https://github.com/PfisterDaniel/node-red-apple-find-me#readme",
+  "homepage": "https://github.com/PfisterDaniel/node-red-contrib-apple-find-me#readme",
   "dependencies": {
     "moment-timezone": "^0.5.31",
     "urllib": "^2.36.1",
