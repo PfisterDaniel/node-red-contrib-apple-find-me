@@ -637,20 +637,32 @@ module.exports = function(RED) {
             try {
                 if(config.inputtype === "msg"){
                     var DeviceIDObject = eval("msg." + config.deviceid)
-                    this.deviceID = DeviceIDObject;
+                    this.deviceid = DeviceIDObject;
                 }else{
-                    this.deviceID = config.deviceid;
+                    this.deviceid = config.deviceid;
+                }
+            }catch(e){
+                node.status({ fill: "red", shape: "dot", text: "Please use a valid device id" });
+            }
+			try {
+                if(config.inputtypetext === "msg"){
+                    var TextObject = eval("msg." + config.text)
+                    this.text = TextObject;
+                }else{
+                    this.text = config.text;
                 }
             }catch(e){
                 node.status({ fill: "red", shape: "dot", text: "Please use a valid device id" });
             }
 
-
             if (this.credentials.appleid == "" || this.credentials.appleid == undefined || this.credentials.password == "" || this.credentials.password == undefined) 
             { 
                 node.status({ fill: "red", shape: "dot", text: "A valid Apple ID is required" });
             }else if(config.deviceid == undefined || config.deviceid == "" ){
-                node.status({ fill: "red", shape: "dot", text: "A DeviceID is required" });
+                node.status({ fill: "red", shape: "dot", text: "A device is required" });
+            }
+			else if(config.text == undefined || config.text == "" ){
+                node.status({ fill: "red", shape: "dot", text: "A message is required" });
             }
             else
             {

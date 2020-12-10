@@ -64,6 +64,7 @@ Redmatic:
 | Account | Your Apple Account |
 | Name | Node Name |
 | Device-ID | ID of the iOS-Device (You can get it with the Locate my Devices Node) |
+| Message | ID of the iOS-Device (You can get it with the Locate my Devices Node) |
 
 
 #### Parameter (Find my Phone):
@@ -135,6 +136,7 @@ Redmatic:
 | 1.0.4 | Added Find my iPhone and send message, Geolocation GoogleMaps |
 | 1.0.5 | Added new Node (apple-find-me-with-payload), API-Key now a Password-Fields |
 |       | Added Descriptions |
+| 1.0.5 | Change from node-red-apple-find-me to node-red-contrib-apple-find-me |
 
 ## Bugs and feature requests
 Please create an issue in [GitHub](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues)
