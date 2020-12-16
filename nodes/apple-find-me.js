@@ -541,20 +541,20 @@ module.exports = function(RED) {
         RED.nodes.createNode(this, config);
         var node = this;
         this.credentials = RED.nodes.getNode(config.account);
+        var DeviceID = "";
 
         this.on('input', async function(msg) {
 
             try {
                 if (config.inputtype === "msg") {
                     var DeviceIDObject = eval("msg." + config.deviceid)
-                    this.deviceID = DeviceIDObject;
+                    DeviceID = DeviceIDObject;
                 } else {
-                    this.deviceID = config.deviceid;
+                    DeviceID = config.deviceid;
                 }
             } catch (e) {
                 node.status({ fill: "red", shape: "dot", text: "Please use a valid device id" });
             }
-
             if (this.credentials.appleid == "" || this.credentials.appleid == undefined || this.credentials.password == "" || this.credentials.password == undefined) {
                 node.status({ fill: "red", shape: "dot", text: "A valid Apple ID is required" });
             } else if (config.deviceid == undefined || config.deviceid == "") {
@@ -567,7 +567,7 @@ module.exports = function(RED) {
                 RequestHeader.Authorization = "Basic " + Buffer.from(this.credentials.appleid + ":" + this.credentials.password).toString('base64');
 
                 //Define Request Content
-                var RequestContent = { "clientContext": { "appVersion": "7.0", "fmly": this.credentials.showfmly }, "device": this.deviceID, "subject": config.subject };
+                var RequestContent = { "clientContext": { "appVersion": "7.0", "fmly": this.credentials.showfmly }, "device": DeviceID, "subject": config.subject };
 
                 urllib.request(RootURL + this.credentials.appleid + '/playSound', {
                         method: 'POST',
