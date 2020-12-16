@@ -1,43 +1,43 @@
 {
-  "name": "node-red-contrib-apple-find-me",
-  "version": "1.0.5",
-  "description": "This is a node-red node to get the current locations and other metrics of connected Apple devices",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/PfisterDaniel/node-red-contrib-apple-find-me.git"
-  },
-  "keywords": [
-    "apple",
-    "iphone",
-    "imac",
-    "icloud",
-    "find-me",
-    "find",
-    "me",
-    "location",
-    "macbook",
-    "node-red"
-  ],
-  "author": "Daniel Pfister",
-  "email" : "kontakt@daniel-pfister.de",
-  "license": "MIT",
-  "node-red": {
-    "nodes": {
-      "apple-find-me": "nodes/apple-find-me.js"
+    "name": "node-red-contrib-apple-find-me",
+    "version": "1.0.7",
+    "description": "This is a node-red node to get the current locations and other metrics of connected Apple devices",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/PfisterDaniel/node-red-contrib-apple-find-me.git"
+    },
+    "keywords": [
+        "apple",
+        "iphone",
+        "imac",
+        "icloud",
+        "find-me",
+        "find",
+        "me",
+        "location",
+        "macbook",
+        "node-red"
+    ],
+    "author": "Daniel Pfister",
+    "email": "kontakt@daniel-pfister.de",
+    "license": "MIT",
+    "node-red": {
+        "nodes": {
+            "apple-find-me": "nodes/apple-find-me.js"
+        }
+    },
+    "bugs": {
+        "url": "https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues"
+    },
+    "homepage": "https://github.com/PfisterDaniel/node-red-contrib-apple-find-me#readme",
+    "dependencies": {
+        "moment-timezone": "^0.5.31",
+        "urllib": "^2.36.1",
+        "geopoint": "^1.0.1",
+        "body-parser": "^1.19.0"
     }
-  },
-  "bugs": {
-    "url": "https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues"
-  },
-  "homepage": "https://github.com/PfisterDaniel/node-red-contrib-apple-find-me#readme",
-  "dependencies": {
-    "moment-timezone": "^0.5.31",
-    "urllib": "^2.36.1",
-    "geopoint": "^1.0.1",
-    "body-parser": "^1.19.0"
-  }
 }

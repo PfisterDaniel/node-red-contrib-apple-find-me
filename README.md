@@ -1,8 +1,4 @@
-
-[![Current Release](https://img.shields.io/github/v/release/PfisterDaniel/node-red-contrib-apple-find-me.svg?colorB=4cc61e)](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/releases/latest)
-
-
-# [node-red](http://nodered.org)-contrib-apple-find-me node
+# <img src="https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/blob/master/nodes/icons/apple.svg" width="60"> [node-red](http://nodered.org)-contrib-apple-find-me
 This is a node-red node to get the current locations and other metrics of connected Apple devices.
 
 It work's without 2-Factor-Authentication (2FA) and retrive all connected devices include family devices.
@@ -11,6 +7,8 @@ It work's without 2-Factor-Authentication (2FA) and retrive all connected device
 
 ## Installation
 [![NPM](https://nodei.co/npm/node-red-contrib-apple-find-me.png)](https://npmjs.org/package/node-red-contrib-apple-find-me)
+
+[![Current Release](https://img.shields.io/github/v/release/PfisterDaniel/node-red-contrib-apple-find-me.svg?colorB=4cc61e)](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/releases/latest)
 
 Install from your Node-RED Manage Palette
 
@@ -66,6 +64,7 @@ Redmatic:
 | Account | Your Apple Account |
 | Name | Node Name |
 | Device-ID | ID of the iOS-Device (You can get it with the Locate my Devices Node) |
+| Message | ID of the iOS-Device (You can get it with the Locate my Devices Node) |
 
 
 #### Parameter (Find my Phone):
@@ -137,6 +136,8 @@ Redmatic:
 | 1.0.4 | Added Find my iPhone and send message, Geolocation GoogleMaps |
 | 1.0.5 | Added new Node (apple-find-me-with-payload), API-Key now a Password-Fields |
 |       | Added Descriptions |
+| 1.0.6 | Change from node-red-apple-find-me to node-red-contrib-apple-find-me |
+| 1.0.7 | Issue #4 (Send Message) solved|
 
 ## Bugs and feature requests
 Please create an issue in [GitHub](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues)

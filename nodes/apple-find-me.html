@@ -11,7 +11,7 @@
             password: {type:"password"}
         },
         color: '#D3D3D3',
-        icon: "apple_w.png",
+        icon: "apple.svg",
         label: function() {
             return this.name||"Apple Account";
         },
@@ -85,13 +85,13 @@
             deviceid:{ value: '', required: true, validate: RED.validators.typedInput('inputtype')},
             playsound:{value: true},
             subject:{value: 'Important Message'},
-            text: {value: "", required: true},
-            inputtype: { value: 'str' }
-            
+            text: {value: "", required: true, validate: RED.validators.typedInput('inputtype')},
+            inputtype: { value: 'str' },
+            inputtypetext: { value: 'str' },
         },
         inputs:1,
         outputs:1,
-        icon: "apple_w.png",
+        icon: "apple.svg",
         paletteLabel: 'Send Message',
         label: function() {
             return this.name||"Apple Find me (Send Message)";
@@ -100,6 +100,11 @@
             $('#node-input-deviceid').typedInput({
                 default: 'str',
                 typeField: $("#node-input-inputtype"),
+                types: ['msg','str']
+            });
+			$('#node-input-text').typedInput({
+                default: 'str',
+                typeField: $("#node-input-inputtypetext"),
                 types: ['msg','str']
             });
         },
@@ -124,7 +129,8 @@
       </div>
     <div class="form-row">
         <label for="node-input-text"><i class="fa fa-commenting"></i> Message:</label>
-        <input type="text" id="node-input-text" placeholder="Message Text">
+        <input type="text" id="node-input-text">
+		<input type="hidden" id="node-input-inputtypetext">
     </div>
     <div class="form-row">
         <label for="node-input-playsound" style="width:auto"><i class="fa fa-volume-up"></i> Play Sound:</label>
@@ -151,7 +157,7 @@
         },
         inputs:1,
         outputs:1,
-        icon: "apple_w.png",
+        icon: "apple.svg",
         paletteLabel: 'Find my Phone',
         label: function() {
             return this.name||"Apple Find me (Find my Phone)";
@@ -212,7 +218,7 @@
         inputs:0,
         outputs:1,
         paletteLabel: 'Locate my Devices',
-        icon: "apple_w.png",
+        icon: "apple.svg",
         label: function() {
             return this.name||"Apple Find me";
         },
@@ -412,8 +418,8 @@
         },
         inputs:1,
         outputs:1,
-        paletteLabel: 'Locate my Devices (run with Payload)',
-        icon: "apple_w.png",
+        paletteLabel: 'Locate my Devices (Input)',
+        icon: "apple.svg",
         label: function() {
             return this.name||"Apple Find me";
         },
