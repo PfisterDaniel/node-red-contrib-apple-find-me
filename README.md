@@ -137,7 +137,7 @@ Redmatic:
 | 1.0.5 | Added new Node (apple-find-me-with-payload), API-Key now a Password-Fields |
 |       | Added Descriptions |
 | 1.0.6 | Change from node-red-apple-find-me to node-red-contrib-apple-find-me |
-| 1.0.7 | [Issue #4 (Send Message](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues/4) solved|
+| 1.0.7 | [Issue #4 (Send Message)](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues/4) solved|
 
 ## Bugs and feature requests
 Please create an issue in [GitHub](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues)
