@@ -212,7 +212,13 @@ module.exports = function(RED) {
                                                 },
                                                 function(err, data, res) {
                                                     if (!err && res.statusCode == 200) {
-                                                        rtn(data.items[0].address);
+                                                        try{
+                                                            rtn(data.items[0].address);
+                                                        }catch(e){
+                                                            node.error('Error: ' + e);
+                                                            node.debug('HereMap-Address: ' + AddressCheckUrlHereMap);
+                                                            rtn("<Error: " + e + ">");
+                                                        }
                                                     } else if (res.statusCode == 401) {
                                                         rtn("<No valid API-KEY for HereMaps>");
                                                     }
@@ -226,7 +232,13 @@ module.exports = function(RED) {
                                                 },
                                                 function(err, data, res) {
                                                     if (!err && res.statusCode == 200) {
-                                                        rtn(data.address);
+                                                        try{
+                                                            rtn(data.address);
+                                                        }catch(e){
+                                                            node.error('Error: ' + e);
+                                                            node.debug('OpenStreetMap-Address: ' + AdressCheckUrlOSM);
+                                                            rtn("<Error: " + e + ">");
+                                                        }
                                                     } else {
                                                         rtn("<Error on OpenStreetMaps ErrorCode: " + res.satusCode + ">");
                                                     }
@@ -241,7 +253,13 @@ module.exports = function(RED) {
                                                 function(err, data, res) {
                                                     if (!err && res.statusCode == 200) {
                                                         if (data.status == "OK") {
-                                                            rtn({ "address_components": data.results[0].address_components, "formatted_address": data.results[0].formatted_address });
+                                                            try{
+                                                                rtn({ "address_components": data.results[0].address_components, "formatted_address": data.results[0].formatted_address });
+                                                            }catch(e){
+                                                                node.error('Error: ' + e);
+                                                                node.debug('GoogleMap-Address: ' + AddressCheckUrlGoogleMaps);
+                                                                rtn("<Error: " + e + ">");
+                                                            }
                                                         } else {
                                                             rtn("<Error: " + data.status + ">");
                                                         }
