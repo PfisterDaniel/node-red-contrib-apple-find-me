@@ -7,7 +7,7 @@ It work's without 2-Factor-Authentication (2FA) and retrive all connected device
 
 ## Installation
 [![NPM](https://nodei.co/npm/node-red-contrib-apple-find-me.png)](https://npmjs.org/package/node-red-contrib-apple-find-me)
-
+[![Downloads](https://img.shields.io/npm/dm/node-red-contrib-apple-find-me.svg)](https://www.npmjs.com/package/node-red-contrib-apple-find-me)
 [![Current Release](https://img.shields.io/github/v/release/PfisterDaniel/node-red-contrib-apple-find-me.svg?colorB=4cc61e)](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/releases/latest)
 
 Install from your Node-RED Manage Palette
