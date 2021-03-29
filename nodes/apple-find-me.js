@@ -678,7 +678,7 @@ module.exports = function(RED) {
                     },
                     function(err, data, res) {
                         if (!err && res.statusCode == 200) {
-                            msg.payload = { "status": "successfully", "statusCode": 0, "message": "Sound was played successfully" }
+                            msg.payload = { "status": "successfully", "statusCode": 0, "message": "Message was send successfully" }
                             node.status({ fill: "green", shape: "dot", text: "Successfully" });
                         } else if (res.statusCode == 500) {
                             msg.payload = { "status": "failed", "statusCode": res.statusCode, "message": res.statusMessage }
