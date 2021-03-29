@@ -26,6 +26,8 @@ module.exports = function(RED) {
         node.appleid = this.credentials.appleid;
         node.password = this.credentials.password;
         node.showfmly = config.showfmly;
+        node.timezone = config.timezone;
+        node.timeformat = config.timeformat;
     }
 
     function checkICloudWithInvervall(config) {
@@ -101,7 +103,7 @@ module.exports = function(RED) {
                                             "batteryLevel": Math.round(entry.batteryLevel * 100),
                                             "batteryState": entry.batteryStatus,
                                             "locationInfo": null,
-                                            "refreshTimeStamp": moment(new Date()).tz('Europe/Berlin').format('YYYY-MM-DD HH:mm:ss'),
+                                            "refreshTimeStamp": moment(new Date()).tz(RED.nodes.getNode(config.account).timezone).format(RED.nodes.getNode(config.account).timeformat),
                                         };
                                         //Add Entry without LocationInfo-Object
                                         devices[entry.modelDisplayName].push(NewDeviceEntryWithoutLocationInfo);
@@ -158,9 +160,9 @@ module.exports = function(RED) {
                                                 "currentAddress": null,
                                                 "osmUrl": OSMUrl,
                                                 "googleUrl": GoogleMapsUrl,
-                                                "locationTimeStamp": moment(new Date(entry.location.timeStamp)).tz('Europe/Berlin').format('YYYY-MM-DD HH:mm')
+                                                "locationTimeStamp": moment(new Date(entry.location.timeStamp)).tz(RED.nodes.getNode(config.account).timezone).format(RED.nodes.getNode(config.account).timeformat)
                                             },
-                                            "refreshTimeStamp": moment(new Date()).tz('Europe/Berlin').format('YYYY-MM-DD HH:mm:ss'),
+                                            "refreshTimeStamp": moment(new Date()).tz(RED.nodes.getNode(config.account).timezone).format(RED.nodes.getNode(config.account).timeformat),
                                         };
                                         //Add Entry with LocationInfo-Object
                                         devices[entry.modelDisplayName].push(NewDeviceEntryWithLocationInfo);
@@ -374,7 +376,7 @@ module.exports = function(RED) {
                                             "batteryLevel": Math.round(entry.batteryLevel * 100),
                                             "batteryState": entry.batteryStatus,
                                             "locationInfo": null,
-                                            "refreshTimeStamp": moment(new Date()).tz('Europe/Berlin').format('YYYY-MM-DD HH:mm:ss'),
+                                            "refreshTimeStamp": moment(new Date()).tz(RED.nodes.getNode(config.account).timezone).format(RED.nodes.getNode(config.account).timeformat),
                                         };
                                         //Add Entry without LocationInfo-Object
                                         devices[entry.modelDisplayName].push(NewDeviceEntryWithoutLocationInfo);
@@ -431,9 +433,9 @@ module.exports = function(RED) {
                                                 "currentAddress": null,
                                                 "osmUrl": OSMUrl,
                                                 "googleUrl": GoogleMapsUrl,
-                                                "locationTimeStamp": moment(new Date(entry.location.timeStamp)).tz('Europe/Berlin').format('YYYY-MM-DD HH:mm')
+                                                "locationTimeStamp": moment(new Date(entry.location.timeStamp)).tz(RED.nodes.getNode(config.account).timezone).format(RED.nodes.getNode(config.account).timeformat)
                                             },
-                                            "refreshTimeStamp": moment(new Date()).tz('Europe/Berlin').format('YYYY-MM-DD HH:mm:ss'),
+                                            "refreshTimeStamp": moment(new Date()).tz(RED.nodes.getNode(config.account).timezone).format(RED.nodes.getNode(config.account).timeformat),
                                         };
                                         //Add Entry with LocationInfo-Object
                                         devices[entry.modelDisplayName].push(NewDeviceEntryWithLocationInfo);
@@ -700,6 +702,8 @@ module.exports = function(RED) {
         var password = req.body.password;
         var id = req.body.id;
         var showfmly = req.body.showfmly;
+        var timezone = req.body.timezone;
+        var timeformat = req.body.timeformat;
 
     });
 

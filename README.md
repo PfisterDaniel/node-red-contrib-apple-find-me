@@ -7,7 +7,7 @@ It work's without 2-Factor-Authentication (2FA) and retrive all connected device
 
 ## Installation
 [![NPM](https://nodei.co/npm/node-red-contrib-apple-find-me.png)](https://npmjs.org/package/node-red-contrib-apple-find-me)
-
+[![Downloads](https://img.shields.io/npm/dm/node-red-contrib-apple-find-me.svg)](https://www.npmjs.com/package/node-red-contrib-apple-find-me)
 [![Current Release](https://img.shields.io/github/v/release/PfisterDaniel/node-red-contrib-apple-find-me.svg?colorB=4cc61e)](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/releases/latest)
 
 Install from your Node-RED Manage Palette
@@ -38,6 +38,8 @@ Redmatic:
 | Name | Node Name |
 | Apple ID | self explanatory |
 | Password | self explanatory |
+| Timezone | Select your Timezone |
+| Format | Define your Time-Format |
 | Show Family-Entries | Shows devices of the family (true / false) |
 
 
@@ -139,6 +141,7 @@ Redmatic:
 | 1.0.6 | Change from node-red-apple-find-me to node-red-contrib-apple-find-me |
 | 1.0.7 | [Issue #4 (Send Message)](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues/4) solved|
 | 1.0.8 | Bug fixed: Crash if address was not found |
+| 1.0.9 | Added Timezone and Time-Format |
 
 ## Bugs and feature requests
 Please create an issue in [GitHub](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues)
