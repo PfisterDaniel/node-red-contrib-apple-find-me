@@ -27,9 +27,11 @@ Redmatic:
     $ npm install --save --no-package-lock --global-style --save-prefix="~" --production node-red-contrib-apple-find-me
 
 Check for Updates:
+
     $ npm outdated
 
 Update:
+
     $ npm install node-red-contrib-apple-find-me@latest
 
 ## Nodes:
