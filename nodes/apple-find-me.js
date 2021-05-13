@@ -25,7 +25,7 @@ module.exports = function(RED) {
         var node = this;
         node.appleid = this.credentials.appleid;
         node.password = this.credentials.password;
-        node.showfmly = config.showfmly;
+        //node.showfmly = config.showfmly;
         node.timezone = config.timezone;
         node.timeformat = config.timeformat;
     }
@@ -58,7 +58,8 @@ module.exports = function(RED) {
                 RequestHeader.Authorization = "Basic " + Buffer.from(this.credentials.appleid + ":" + this.credentials.password).toString('base64');
 
                 //Define Request Content
-                var RequestContent = { "clientContext": { "appVersion": "7.0", "fmly": "" + this.credentials.showfmly + "" } };
+
+                //var RequestContent = { "clientContext": { "appVersion": "7.0", "fmly": "" + this.credentials.showfmly + "" } };
 
 
 
@@ -68,7 +69,8 @@ module.exports = function(RED) {
                             headers: RequestHeader,
                             rejectUnauthorized: false,
                             dataType: 'json',
-                            content: JSON.stringify(RequestContent)
+                            //content: JSON.stringify(RequestContent)
+                            content: ''
                         },
                         function(err, data, res) {
                             if (!err && res.statusCode == 200) {
@@ -214,9 +216,9 @@ module.exports = function(RED) {
                                                 },
                                                 function(err, data, res) {
                                                     if (!err && res.statusCode == 200) {
-                                                        try{
+                                                        try {
                                                             rtn(data.items[0].address);
-                                                        }catch(e){
+                                                        } catch (e) {
                                                             node.error('Error: ' + e);
                                                             node.debug('HereMap-Address: ' + AddressCheckUrlHereMap);
                                                             rtn("<Error: " + e + ">");
@@ -234,9 +236,9 @@ module.exports = function(RED) {
                                                 },
                                                 function(err, data, res) {
                                                     if (!err && res.statusCode == 200) {
-                                                        try{
+                                                        try {
                                                             rtn(data.address);
-                                                        }catch(e){
+                                                        } catch (e) {
                                                             node.error('Error: ' + e);
                                                             node.debug('OpenStreetMap-Address: ' + AdressCheckUrlOSM);
                                                             rtn("<Error: " + e + ">");
@@ -255,9 +257,9 @@ module.exports = function(RED) {
                                                 function(err, data, res) {
                                                     if (!err && res.statusCode == 200) {
                                                         if (data.status == "OK") {
-                                                            try{
+                                                            try {
                                                                 rtn({ "address_components": data.results[0].address_components, "formatted_address": data.results[0].formatted_address });
-                                                            }catch(e){
+                                                            } catch (e) {
                                                                 node.error('Error: ' + e);
                                                                 node.debug('GoogleMap-Address: ' + AddressCheckUrlGoogleMaps);
                                                                 rtn("<Error: " + e + ">");
@@ -331,7 +333,7 @@ module.exports = function(RED) {
                 RequestHeader.Authorization = "Basic " + Buffer.from(this.credentials.appleid + ":" + this.credentials.password).toString('base64');
 
                 //Define Request Content
-                var RequestContent = { "clientContext": { "appVersion": "7.0", "fmly": "" + this.credentials.showfmly + "" } };
+                //var RequestContent = { "clientContext": { "appVersion": "7.0", "fmly": "" + this.credentials.showfmly + "" } };
 
 
 
@@ -341,7 +343,8 @@ module.exports = function(RED) {
                             headers: RequestHeader,
                             rejectUnauthorized: false,
                             dataType: 'json',
-                            content: JSON.stringify(RequestContent)
+                            //content: JSON.stringify(RequestContent)
+                            content: ''
                         },
                         function(err, data, res) {
                             if (!err && res.statusCode == 200) {
@@ -587,7 +590,7 @@ module.exports = function(RED) {
                 RequestHeader.Authorization = "Basic " + Buffer.from(this.credentials.appleid + ":" + this.credentials.password).toString('base64');
 
                 //Define Request Content
-                var RequestContent = { "clientContext": { "appVersion": "7.0", "fmly": this.credentials.showfmly }, "device": DeviceID, "subject": config.subject };
+                var RequestContent = { "clientContext": { "appVersion": "7.0", "fmly": true }, "device": DeviceID, "subject": config.subject };
 
                 urllib.request(RootURL + this.credentials.appleid + '/playSound', {
                         method: 'POST',
@@ -662,7 +665,7 @@ module.exports = function(RED) {
                 var RequestContent = {
                     "clientContext": {
                         "appVersion": "7.0",
-                        "fmly": this.credentials.showfmly
+                        "fmly": true
                     },
                     "device": DeviceID,
                     "sound": config.playsound,
@@ -701,7 +704,7 @@ module.exports = function(RED) {
         var appleid = req.body.appleid;
         var password = req.body.password;
         var id = req.body.id;
-        var showfmly = req.body.showfmly;
+        //var showfmly = req.body.showfmly;
         var timezone = req.body.timezone;
         var timeformat = req.body.timeformat;
 
