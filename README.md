@@ -143,7 +143,7 @@ Redmatic:
 | 1.0.7 | [Issue #4 (Send Message)](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues/4) solved|
 | 1.0.8 | Bug fixed: Crash if address was not found |
 | 1.0.9 | Added Timezone and Time-Format |
-| 1.1.0 | Remove Family-Devices (not longer working) |
+| 1.1.0 | Remove Family-Devices (not longer working) [Issue #15](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues/15)|
 
 ## Bugs and feature requests
 Please create an issue in [GitHub](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues)
