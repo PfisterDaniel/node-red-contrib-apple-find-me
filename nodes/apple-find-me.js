@@ -295,7 +295,7 @@ module.exports = function(RED) {
                         node.status({ fill: "red", shape: "dot", text: "403 - Please check your Account-Information" });
                         node.emit("close", {});
                     } else {
-                        node.status({ fill: "red", shape: "dot", text: "ErrorCode: " + res.statusCode });
+                        node.status({ fill: "red", shape: "dot", text: "ErrorCode: " + DeviceRequestResult.code });
                         node.emit("close", {});
                     }
                 }
