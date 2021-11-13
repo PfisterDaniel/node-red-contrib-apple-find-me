@@ -12,7 +12,11 @@
             },
             timeformat: {
                 value: "YYYY-MM-DD HH:mm:ss"
+            },
+            timeout: {
+                value: "5"
             }
+            
         },
         credentials: {
             appleid: {
@@ -35,6 +39,7 @@
             //var showfmly = $('#node-config-input-showfmly').val();
             var timezone = $('#node-config-input-timezone').val();
             var timeformat = $('#node-config-input-timeformat').val();
+            var timeout = $('#node-config-input-timeout').val();
             if (password != '_PWD_') {
                 var account = {
                     id: node.id,
@@ -680,10 +685,14 @@
         <input type="text" id="node-config-input-timeformat" placeholder="Example: YYYY-MM-DD HH:mm:ss">
         <a href="https://momentjs.com/docs/#/parsing/string-format/" target="_blank" title="Get information about available formats..."><i class="fa fa-question-circle" aria-hidden="true"></i></a>
     </div>
+    <div class="form-row">
+        <label for="node-config-input-timeout" style="width:140px"><i class="fa fa-history"></i> Request-Timeout:</label>
+        <input type="text" id="node-config-input-timeout" style="display:inline-block; width:80px; vertical-align:middle;" placeholder="5"><span>   Seconds</span>
+    </div>
     <!-- Familiy Devices are not longer working-->
     <!--<hr>
     <div class="form-row">
-        <label for="node-config-input-showfmly" style="width:160px"><i class="fa fa-users"></i> Show Family-Entries:</label>
+        <label for="node-config-input-showfmly" style="width:155px"><i class="fa fa-users"></i> Show Family-Entries:</label>
         <input type="checkbox" checked id="node-config-input-showfmly" style="display:inline-block; width:auto; vertical-align:top;">
     </div>
     <div class="form-tips">

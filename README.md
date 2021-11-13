@@ -49,6 +49,7 @@ Update:
 | Password | self explanatory |
 | Timezone | Select your Timezone |
 | Format | Define your Time-Format |
+| Request-Timeout | Define Request-Timeout in seconds |
 
 
 #### Parameter (Locate my Devices):
@@ -151,6 +152,8 @@ Update:
 | 1.0.8 | Bug fixed: Crash if address was not found |
 | 1.0.9 | Added Timezone and Time-Format |
 | 1.1.0 | Remove Family-Devices (not longer working) [Issue #15](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues/15)|
+| 1.1.1 | Change Version|
+| 1.1.2 | Add Request-Timeout Settings in Account-Node|
 
 ## Bugs and feature requests
 Please create an issue in [GitHub](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues)

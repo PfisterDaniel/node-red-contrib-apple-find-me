@@ -28,6 +28,7 @@ module.exports = function(RED) {
         //node.showfmly = config.showfmly;
         node.timezone = config.timezone;
         node.timeformat = config.timeformat;
+        node.timeout = config.timeout;
     }
 
     function checkICloudWithInvervall(config) {
@@ -69,6 +70,7 @@ module.exports = function(RED) {
                             headers: RequestHeader,
                             rejectUnauthorized: false,
                             dataType: 'json',
+                            timeout: RED.nodes.getNode(config.account).timeout * 1000,
                             //content: JSON.stringify(RequestContent)
                             content: ''
                         },
@@ -212,7 +214,8 @@ module.exports = function(RED) {
                                             urllib.request(AddressCheckUrlHereMap, {
                                                     method: 'GET',
                                                     rejectUnauthorized: false,
-                                                    dataType: 'json'
+                                                    dataType: 'json',
+                                                    timeout: RED.nodes.getNode(config.account).timeout * 1000
                                                 },
                                                 function(err, data, res) {
                                                     if (!err && res.statusCode == 200) {
@@ -252,7 +255,8 @@ module.exports = function(RED) {
                                             urllib.request(AddressCheckUrlGoogleMaps, {
                                                     method: 'GET',
                                                     rejectUnauthorized: false,
-                                                    dataType: 'json'
+                                                    dataType: 'json',
+                                                    timeout: RED.nodes.getNode(config.account).timeout * 1000
                                                 },
                                                 function(err, data, res) {
                                                     if (!err && res.statusCode == 200) {
@@ -343,6 +347,7 @@ module.exports = function(RED) {
                             headers: RequestHeader,
                             rejectUnauthorized: false,
                             dataType: 'json',
+                            timeout: RED.nodes.getNode(config.account).timeout * 1000,
                             //content: JSON.stringify(RequestContent)
                             content: ''
                         },
@@ -486,7 +491,8 @@ module.exports = function(RED) {
                                             urllib.request(AddressCheckUrlHereMap, {
                                                     method: 'GET',
                                                     rejectUnauthorized: false,
-                                                    dataType: 'json'
+                                                    dataType: 'json',
+                                                    timeout: RED.nodes.getNode(config.account).timeout * 1000
                                                 },
                                                 function(err, data, res) {
                                                     if (!err && res.statusCode == 200) {
@@ -500,7 +506,8 @@ module.exports = function(RED) {
                                             urllib.request(AdressCheckUrlOSM, {
                                                     method: 'GET',
                                                     rejectUnauthorized: false,
-                                                    dataType: 'json'
+                                                    dataType: 'json',
+                                                    timeout: RED.nodes.getNode(config.account).timeout * 1000
                                                 },
                                                 function(err, data, res) {
                                                     if (!err && res.statusCode == 200) {
@@ -514,7 +521,8 @@ module.exports = function(RED) {
                                             urllib.request(AddressCheckUrlGoogleMaps, {
                                                     method: 'GET',
                                                     rejectUnauthorized: false,
-                                                    dataType: 'json'
+                                                    dataType: 'json',
+                                                    timeout: RED.nodes.getNode(config.account).timeout * 1000
                                                 },
                                                 function(err, data, res) {
                                                     if (!err && res.statusCode == 200) {
@@ -597,6 +605,7 @@ module.exports = function(RED) {
                         headers: RequestHeader,
                         rejectUnauthorized: false,
                         dataType: 'json',
+                        timeout: RED.nodes.getNode(config.account).timeout * 1000,
                         content: JSON.stringify(RequestContent)
                     },
                     function(err, data, res) {
@@ -679,6 +688,7 @@ module.exports = function(RED) {
                         headers: RequestHeader,
                         rejectUnauthorized: false,
                         dataType: 'json',
+                        timeout: RED.nodes.getNode(config.account).timeout * 1000,
                         content: JSON.stringify(RequestContent)
                     },
                     function(err, data, res) {
