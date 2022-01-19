@@ -154,6 +154,7 @@ Update:
 | 1.1.0 | Remove Family-Devices (not longer working) [Issue #15](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues/15)|
 | 1.1.1 | Change Version|
 | 1.1.2 | Add Request-Timeout Settings in Account-Node|
+| 1.1.3 | Bug fixed: [Issue #22](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues/22) |
 
 ## Bugs and feature requests
 Please create an issue in [GitHub](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues)
