@@ -22,8 +22,8 @@
         "macbook",
         "node-red"
     ],
-    "author": "Daniel Pfister",
-    "email": "kontakt@daniel-pfister.de",
+    "author": "Daniel Lippert",
+    "email": "kontakt@daniel-lippert.de",
     "license": "MIT",
     "node-red": {
         "nodes": {
@@ -39,5 +39,11 @@
         "urllib": "^2.36.1",
         "geopoint": "^1.0.1",
         "body-parser": "^1.19.0"
+    },
+    "engines": {
+    	"node": ">=12.0.0",
+    },
+    "node-red": {
+	"version": ">=2.0.0",
     }
 }
