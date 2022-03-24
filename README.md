@@ -5,6 +5,8 @@ It work's without 2-Factor-Authentication (2FA) and retrive all connected device
 
 Important: Family-Devices are not longer working!
 
+## Donation:
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate/?hosted_button_id=NF8XH8AMXZV2J)
 
 
 ## Installation
