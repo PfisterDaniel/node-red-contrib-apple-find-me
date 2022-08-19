@@ -158,6 +158,7 @@ Update:
 | 1.1.2 | Add Request-Timeout Settings in Account-Node|
 | 1.1.3 | Bug fixed: [Issue #22](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues/22) |
 | 1.1.4 | Bug fixed: [Issue #23](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues/23) |
+| 1.1.5 | Bug fixed: Problem with Package.json in 1.1.4 |
 
 ## Bugs and feature requests
 Please create an issue in [GitHub](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues)
