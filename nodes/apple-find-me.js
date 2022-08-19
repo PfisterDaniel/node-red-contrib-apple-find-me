@@ -20,6 +20,21 @@ module.exports = function(RED) {
     //Constanten
     const RootURL = 'https://fmipmobile.icloud.com/fmipservice/device/';
 
+
+    /**
+    * Get Random Object from an Object Array
+    * @param {*} ObjectArray 
+    * @returns 
+    */
+    function getRandomObject(ObjectArray) {  
+        // get random index value
+        const randomIndex = Math.floor(Math.random() * ObjectArray.length);
+        // get random object
+        const obj = ObjectArray[randomIndex];
+        return obj;
+    }
+
+
     function AppleFindMeAccount(config) {
         RED.nodes.createNode(this, config);
         var node = this;
@@ -29,6 +44,24 @@ module.exports = function(RED) {
         node.timezone = config.timezone;
         node.timeformat = config.timeformat;
         node.timeout = config.timeout;
+    }
+
+
+
+    /**
+     * Get Random Object from an Object Array
+     * @param {*} ObjectArray 
+     * @returns 
+     */
+    function getRandomObject(ObjectArray) {
+
+        // get random index value
+        const randomIndex = Math.floor(Math.random() * ObjectArray.length);
+
+        // get random object
+        const obj = ObjectArray[randomIndex];
+
+        return obj;
     }
 
     function checkICloudWithInvervall(config) {
@@ -205,7 +238,15 @@ module.exports = function(RED) {
                                     //Build Address-Crawl URL's
                                     var AdressCheckUrlOSM = "https://nominatim.openstreetmap.org/reverse?format=json&accept-language=de-DE&lat=" + msg.payload[item][device].locationInfo.latitude + "&lon=" + msg.payload[item][device].locationInfo.longitude + "&zoom=18&addressdetails=1";
                                     var AddressCheckUrlHereMap = "https://revgeocode.search.hereapi.com/v1/revgeocode?at=" + msg.payload[item][device].locationInfo.latitude.toFixed(6) + "," + msg.payload[item][device].locationInfo.longitude.toFixed(6) + "&apiKey=" + config.hereMapApiKey;
-                                    var AddressCheckUrlGoogleMaps = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + msg.payload[item][device].locationInfo.latitude + "," + msg.payload[item][device].locationInfo.longitude + "&language=de&result_type=street_address&key=" + config.googleMapsApiKey;
+                                    var AddressCheckUrlGoogleMaps = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + msg.payload[item][device].locationInfo.latitude + "," + msg.payload[item][device].locationInfo.longitude + "&language=de&key=" + config.googleMapsApiKey;
+
+                                    //Build Elevation Address-Crawl URL's (We need multible Adresses to bypass Rate Limit or Error 429 )
+                                    var UrlArray = 
+                                    [{id:1, url:`https://api.smarthome-development.de/api/v1/get-elevation?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}&format=json`},
+                                     {id:2, url:`https://api.opentopodata.org/v1/eudem25m?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}`},
+                                     {id:3, url:`https://api.open-elevation.com/api/v1/lookup?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}`}];
+
+                                    var OpenEvaltionAPIUrl = getRandomObject(UrlArray);
 
                                     //Crawl Address in Sub-Request
                                     var crawledAddress = new Promise(rtn => {
@@ -277,6 +318,32 @@ module.exports = function(RED) {
                                         }
                                     })
                                     msg.payload[item][device].locationInfo.currentAddress = await crawledAddress;
+
+
+                                    //Crawl Elevevation
+                                    var crawledElevation = new Promise(rtn => {
+                                        urllib.request(OpenEvaltionAPIUrl.url, {
+                                            method: 'GET',
+                                            rejectUnauthorized: false,
+                                            dataType: 'json',
+                                            timeout: RED.nodes.getNode(config.account).timeout * 1000
+                                        },
+                                        function(err, data, res) {
+                                            if (!err && res.statusCode == 200) {
+                                                try {
+                                                    rtn(parseInt(data.results[0].elevation.toFixed(2)));
+                                                } catch (e) {
+                                                    node.error('Error: ' + e);
+                                                    node.debug('Get Elevation: ' + OpenEvaltionAPIUrl.url);
+                                                    rtn("<Error: " + e + ">");
+                                                }
+                                            } else if (res.statusCode == 401) {
+                                                rtn("<No valid API-KEY for HereMaps>");
+                                            }
+                                        });
+                                    })
+                                    msg.payload[item][device].locationInfo.altitude = await crawledElevation;
+
                                 }
                             };
                         }
@@ -290,7 +357,7 @@ module.exports = function(RED) {
                     if (DeviceRequestResult.code == -2) {
                         node.status({ fill: "yellow", shape: "dot", text: "Await next run" });
                     } else if (DeviceRequestResult.code == 401) {
-                        node.status({ fill: "red", shape: "dot", text: "404 - Not authorised" });
+                        node.status({ fill: "red", shape: "dot", text: "401 - Not authorised" });
                         node.emit("close", {});
                     } else if (DeviceRequestResult.code == 404) {
                         node.status({ fill: "red", shape: "dot", text: "404 - Page not found" });
@@ -482,7 +549,18 @@ module.exports = function(RED) {
                                     //Build Address-Crawl URL's
                                     var AdressCheckUrlOSM = "https://nominatim.openstreetmap.org/reverse?format=json&accept-language=de-DE&lat=" + msg.payload[item][device].locationInfo.latitude + "&lon=" + msg.payload[item][device].locationInfo.longitude + "&zoom=18&addressdetails=1";
                                     var AddressCheckUrlHereMap = "https://revgeocode.search.hereapi.com/v1/revgeocode?at=" + msg.payload[item][device].locationInfo.latitude.toFixed(6) + "," + msg.payload[item][device].locationInfo.longitude.toFixed(6) + "&apiKey=" + config.hereMapApiKey;
-                                    var AddressCheckUrlGoogleMaps = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + msg.payload[item][device].locationInfo.latitude + "," + msg.payload[item][device].locationInfo.longitude + "&language=de&result_type=street_address&key=" + config.googleMapsApiKey;
+                                    var AddressCheckUrlGoogleMaps = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + msg.payload[item][device].locationInfo.latitude + "," + msg.payload[item][device].locationInfo.longitude + "&language=de&key=" + config.googleMapsApiKey;
+
+
+                                    //Build OpenElevation-URL's
+                                    var ElevationUrlArray = 
+                                    [
+                                        {id:1, url:`https://api.smarthome-development.de/api/v1/get-elevation?locations=${msg.payload[item][device].locationInfo.l>atitude},${msg.payload[item][device].locationInfo.longitude}&format=json`},
+                                        {id:2, url:`https://api.opentopodata.org/v1/eudem25m?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}`},
+                                        {id:3, url:`https://api.open-elevation.com/api/v1/lookup?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}`}
+                                    ];
+
+
 
                                     //Crawl Address in Sub-Request
                                     var crawledAddress = new Promise(rtn => {
@@ -535,8 +613,32 @@ module.exports = function(RED) {
                                                     }
                                                 });
                                         }
-                                    })
+                                    });
                                     msg.payload[item][device].locationInfo.currentAddress = await crawledAddress;
+
+                                    if(msg.payload[item][device].locationInfo.altitude = 0){
+                                        //Crawl Elevation in Sub-Request
+                                        var crawledElevation = new Promise(rtn => {
+                                            //Gets a random url to evade the rate limit
+                                            var OpenEvaltionAPIUrl = getRandomObject(ElevationUrlArray);
+
+                                            urllib.request(OpenEvaltionAPIUrl.url, {
+                                                method: 'GET',
+                                                rejectUnauthorized: false,
+                                                dataType: 'json',
+                                                timeout: RED.nodes.getNode(config.account).timeout * 1000
+                                            },
+                                            function(err, data, res) {
+                                                if (!err && res.statusCode == 200) {
+                                                    var AltValue = parseFloat(data.results[0].elevation.toFixed(2));
+                                                    rtn({ "value" : AltValue });
+                                                }else{
+                                                    rtn({ "value" : 0 });
+                                                }
+                                            });
+                                        });
+                                        msg.payload[item][device].locationInfo.altitude = await crawledElevation.value;
+                                    }
                                 }
                             };
                         }
@@ -550,7 +652,7 @@ module.exports = function(RED) {
                     if (DeviceRequestResult.code == -2) {
                         node.status({ fill: "yellow", shape: "dot", text: "Await next run" });
                     } else if (DeviceRequestResult.code == 401) {
-                        node.status({ fill: "red", shape: "dot", text: "404 - Not authorised" });
+                        node.status({ fill: "red", shape: "dot", text: "401 - Not authorised" });
                         node.emit("close", {});
                     } else if (DeviceRequestResult.code == 404) {
                         node.status({ fill: "red", shape: "dot", text: "404 - Page not found" });
@@ -625,6 +727,7 @@ module.exports = function(RED) {
             }
         })
     }
+
 
 
 
@@ -708,6 +811,7 @@ module.exports = function(RED) {
             }
         })
     }
+
 
     RED.httpAdmin.use('/apple-find-me-account/new-account', bodyParser.json());
     RED.httpAdmin.post('/apple-find-me-account/new-account', async function(req, res) {
