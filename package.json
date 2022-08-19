@@ -25,7 +25,10 @@
     "email": "kontakt@daniel-lippert.de",
     "license": "MIT",
     "node-red": {
-        "version": ">=2.0.0"
+        "version": ">=2.0.0",
+         "nodes": {
+            "apple-find-me": "nodes/apple-find-me.js"
+        }
     },
     "bugs": {
         "url": "https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues"
