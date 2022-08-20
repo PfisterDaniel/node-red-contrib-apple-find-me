@@ -163,3 +163,4 @@ Update:
 
 ## Bugs and feature requests
 Please create an issue in [GitHub](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues)
+ 
