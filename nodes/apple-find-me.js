@@ -77,25 +77,19 @@ module.exports = function(RED) {
 
         this.on('input', async function(msg) {
             //Check if Apple ID and Password is not empty
-            if (this.credentials.appleid == "" || this.credentials.appleid == undefined || this.credentials.password == "" || this.credentials.password == undefined) {
-                node.status({ fill: "red", shape: "dot", text: "A valid Apple ID is required" });
+            if (this.credentials == null || this.credentials == undefined || this.credentials.appleid == undefined || this.credentials.appleid == ""  || this.credentials.password == "" || this.credentials.password == undefined) {
+                node.status({ fill: "red", shape: "dot", text: "A valid Apple-Account is required" });
             }
             //Checking if GeoAPI an API where need's a API-KEY
-            else if (config.geoAPI == "HERE" && config.hereMapApiKey == "") {
-                node.status({ fill: "red", shape: "dot", text: "HereMap API-Key is required" });
-            } else if (config.geoAPI == "GOOGLE" && config.googleMapsApiKey == "") {
-                node.status({ fill: "red", shape: "dot", text: "GoogleMaps API-Key is required" });
+            else if (config.geoAPI != "osm" && config.geoApiKey == "") {
+                node.status({ fill: "red", shape: "dot", text: "A API-Key for Geolocation is required" });
             } else {
                 node.status({});
-
                 //Define Authentication to Request Header
                 RequestHeader.Authorization = "Basic " + Buffer.from(this.credentials.appleid + ":" + this.credentials.password).toString('base64');
 
                 //Define Request Content
-
                 //var RequestContent = { "clientContext": { "appVersion": "7.0", "fmly": "" + this.credentials.showfmly + "" } };
-
-
 
                 var DeviceRequest = new Promise(rtn => {
                     urllib.request(RootURL + this.credentials.appleid + '/initClient', {
@@ -217,8 +211,11 @@ module.exports = function(RED) {
                 msg.payload = {};
 
                 node.status({ fill: "blue", shape: "dot", text: "Fetching Devices..." });
+
                 //Wait for Device-Request
                 var DeviceRequestResult = await DeviceRequest;
+
+                console.log(DeviceRequestResult);
 
                 if (DeviceRequestResult.status) {
                     msg.payload = DeviceRequestResult.data;
@@ -236,87 +233,165 @@ module.exports = function(RED) {
                                 } else {
 
                                     //Build Address-Crawl URL's
-                                    var AdressCheckUrlOSM = "https://nominatim.openstreetmap.org/reverse?format=json&accept-language=de-DE&lat=" + msg.payload[item][device].locationInfo.latitude + "&lon=" + msg.payload[item][device].locationInfo.longitude + "&zoom=18&addressdetails=1";
-                                    var AddressCheckUrlHereMap = "https://revgeocode.search.hereapi.com/v1/revgeocode?at=" + msg.payload[item][device].locationInfo.latitude.toFixed(6) + "," + msg.payload[item][device].locationInfo.longitude.toFixed(6) + "&apiKey=" + config.hereMapApiKey;
-                                    var AddressCheckUrlGoogleMaps = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + msg.payload[item][device].locationInfo.latitude + "," + msg.payload[item][device].locationInfo.longitude + "&language=de&key=" + config.googleMapsApiKey;
+                                    var GeolocationUrlArray = [
+
+                                        {id:"osm", url:`https://nominatim.openstreetmap.org/reverse?format=json&accept-language=de-DE&lat=${msg.payload[item][device].locationInfo.latitude}&lon=${msg.payload[item][device].locationInfo.longitude}&zoom=18&addressdetails=1`},
+                                        {id:"here", url:`https://revgeocode.search.hereapi.com/v1/revgeocode?at=${msg.payload[item][device].locationInfo.latitude.toFixed(6)},${msg.payload[item][device].locationInfo.longitude.toFixed(6)}&apiKey=${config.geoApiKey}`},
+                                        {id:"bing", url:`https://dev.virtualearth.net/REST/v1/Locations/${msg.payload[item][device].locationInfo.latitude.toFixed(6)},${msg.payload[item][device].locationInfo.longitude.toFixed(6)}?incl=ciso2&inclnb=1&key=${config.geoApiKey}`},
+                                        {id:"google", url:`https://maps.googleapis.com/maps/api/geocode/json?latlng=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}&language=de&key=${config.geoApiKey}`},
+                                        {id:"geoapify", url:`https://api.geoapify.com/v1/geocode/reverse?lat=${msg.payload[item][device].locationInfo.latitude}&lon=${msg.payload[item][device].locationInfo.longitude}&apiKey=${config.geoApiKey}`},
+                                        {id:"locationiq_eu", url:`https://eu1.locationiq.com/v1/reverse?key=${config.geoApiKey}&lat=${msg.payload[item][device].locationInfo.latitude}&lon=${msg.payload[item][device].locationInfo.longitude}&format=json`},
+                                        {id:"locationiq_usa", url:`https://us1.locationiq.com/v1/reverse?key=${config.geoApiKey}&lat=${msg.payload[item][device].locationInfo.latitude}&lon=${msg.payload[item][device].locationInfo.longitude}&format=json`},
+                                        {id:"positionstack", url:`http://api.positionstack.com/v1/reverse?access_key=${config.geoApiKey}&query=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}&output=json&limit=1`},
+                                        {id:"tomtom", url:`https://api.tomtom.com/search/2/reverseGeocode/${msg.payload[item][device].locationInfo.latitude}%2C${msg.payload[item][device].locationInfo.longitude}?key=${config.geoApiKey}&ext=json`},
+                                        
+                                    ];
 
                                     //Build Elevation Address-Crawl URL's (We need multible Adresses to bypass Rate Limit or Error 429 )
-                                    var UrlArray = 
-                                    [{id:1, url:`https://api.smarthome-development.de/api/v1/get-elevation?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}&format=json`},
-                                     {id:2, url:`https://api.opentopodata.org/v1/eudem25m?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}`},
-                                     {id:3, url:`https://api.open-elevation.com/api/v1/lookup?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}`}];
+                                    var ElevationUrlArray = [
+                                        
+                                        {id:1, url:`https://api.smarthome-development.de/api/v1/get-elevation?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}&format=json`},
+                                        {id:2, url:`https://api.opentopodata.org/v1/eudem25m?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}`},
+                                        {id:3, url:`https://api.open-elevation.com/api/v1/lookup?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}`}
+                                    
+                                    ];
 
-                                    var OpenEvaltionAPIUrl = getRandomObject(UrlArray);
+                                    var OpenEvaltionAPIUrl = getRandomObject(ElevationUrlArray);
 
                                     //Crawl Address in Sub-Request
                                     var crawledAddress = new Promise(rtn => {
-                                        //Using HereMapAPI
-                                        if (config.geoAPI == "HERE") {
-                                            urllib.request(AddressCheckUrlHereMap, {
-                                                    method: 'GET',
-                                                    rejectUnauthorized: false,
-                                                    dataType: 'json',
-                                                    timeout: RED.nodes.getNode(config.account).timeout * 1000
-                                                },
-                                                function(err, data, res) {
-                                                    if (!err && res.statusCode == 200) {
-                                                        try {
-                                                            rtn(data.items[0].address);
-                                                        } catch (e) {
-                                                            node.error('Error: ' + e);
-                                                            node.debug('HereMap-Address: ' + AddressCheckUrlHereMap);
-                                                            rtn("<Error: " + e + ">");
+                                        var usedUrl = GeolocationUrlArray.find((item) => item.id == config.geoAPI);
+
+                                        urllib.request(usedUrl.url, {
+                                            method: 'GET',
+                                            rejectUnauthorized: false,
+                                            dataType: 'json',
+                                            timeout: RED.nodes.getNode(config.account).timeout * 1000
+                                        },
+                                        function(err, data, res) {
+                                            if (config.geoAPI === 'osm') {
+                                                if (!err && res.statusCode == 200) {
+                                                    var CurrentAddress = "";
+                                                    if (data.hasOwnProperty('address')) {
+                                                        var AddressObject = data.address;
+                                                        if (AddressObject.hasOwnProperty('road')) {
+                                                            CurrentAddress += AddressObject.road;
+                                                            if (AddressObject.hasOwnProperty('house_number')) {
+                                                                CurrentAddress += " " + AddressObject.house_number;
+                                                            } 
+                                                            CurrentAddress += ", ";
                                                         }
-                                                    } else if (res.statusCode == 401) {
-                                                        rtn("<No valid API-KEY for HereMaps>");
-                                                    }
-                                                });
-                                        } else if (config.geoAPI == "OSM") {
-                                            //Using OpenStreetMap-API
-                                            urllib.request(AdressCheckUrlOSM, {
-                                                    method: 'GET',
-                                                    rejectUnauthorized: false,
-                                                    dataType: 'json'
-                                                },
-                                                function(err, data, res) {
-                                                    if (!err && res.statusCode == 200) {
-                                                        try {
-                                                            rtn(data.address);
-                                                        } catch (e) {
-                                                            node.error('Error: ' + e);
-                                                            node.debug('OpenStreetMap-Address: ' + AdressCheckUrlOSM);
-                                                            rtn("<Error: " + e + ">");
+                                                        if (AddressObject.hasOwnProperty('postcode')) {
+                                                            CurrentAddress += AddressObject.postcode + " ";
+                                                        }
+                                                        if (AddressObject.hasOwnProperty('village')) {
+                                                            CurrentAddress += AddressObject.village;
+                                                        } else {
+                                                            if (AddressObject.hasOwnProperty('town')) {
+                                                                CurrentAddress += AddressObject.town;
+                                                            }
                                                         }
                                                     } else {
-                                                        rtn("<Error on OpenStreetMaps ErrorCode: " + res.satusCode + ">");
+                                                        CurrentAddress = "Response has no Address Object";
                                                     }
-                                                });
-                                        } else if (config.geoAPI == "GOOGLE") {
-                                            //Using GoogleMaps-API
-                                            urllib.request(AddressCheckUrlGoogleMaps, {
-                                                    method: 'GET',
-                                                    rejectUnauthorized: false,
-                                                    dataType: 'json',
-                                                    timeout: RED.nodes.getNode(config.account).timeout * 1000
-                                                },
-                                                function(err, data, res) {
-                                                    if (!err && res.statusCode == 200) {
-                                                        if (data.status == "OK") {
-                                                            try {
-                                                                rtn({ "address_components": data.results[0].address_components, "formatted_address": data.results[0].formatted_address });
-                                                            } catch (e) {
-                                                                node.error('Error: ' + e);
-                                                                node.debug('GoogleMap-Address: ' + AddressCheckUrlGoogleMaps);
-                                                                rtn("<Error: " + e + ">");
-                                                            }
-                                                        } else {
-                                                            rtn("<Error: " + data.status + ">");
-                                                        }
-
+                                                    rtn(CurrentAddress);
+                                                }else if(res.statusCode == 401){
+                                                    rtn("< API-Key not valid >");
+                                                }else {
+                                                    rtn(`< ErrorCode ${res.statusCode}>`);
+                                                }
+                                            }else if (config.geoAPI === 'bing') {
+                                                if (!err && res.statusCode == 200) {
+                                                    var CurrentAddress = data.resourceSets[0].resources[0].address.formattedAddress;
+                                                    rtn(CurrentAddress);
+                                                } else {
+                                                    if (res.statusCode == 401) {
+                                                        rtn("< No valid API-KEY >");
+                                                    }else{
+                                                        rtn(`< ErrorCode ${res.statusCode}>`);
                                                     }
-                                                });
-                                        }
-                                    })
+                                                }
+                                            }else if (config.geoAPI  === 'here') {
+                                                if (!err && res.statusCode == 200) {
+                                                    try {
+                                                        var CurrentAddress = data.items[0].address.label;
+                                                        rtn(CurrentAddress);
+                                                    } catch (e) {
+                                                        rtn(`< Error ${e}>`);
+                                                    }
+                                                }else if(res.statusCode == 401){
+                                                    rtn("< API-Key not valid >");
+                                                }else {
+                                                    rtn(`< ErrorCode ${res.statusCode}>`);
+                                                }
+                                            }else if (config.geoAPI  === 'google') {
+                                                if (!err && res.statusCode == 200) {
+                                                    if (data.status == "OK") {
+                                                        var CurrentAddress = data.results[0].formatted_address;
+                                                        rtn(CurrentAddress);
+                                                    } else {
+                                                        rtn(`< Error ${data.status}>`);
+                                                    }
+                                                }else if(res.statusCode == 401){
+                                                    rtn("< API-Key not valid >");
+                                                }else {
+                                                    rtn(`< ErrorCode ${res.statusCode}>`);
+                                                }
+                                            }else if (config.geoAPI === 'geoapify') {
+                                                if (!err && res.statusCode == 200) {
+                                                    try {
+                                                        var CurrentAddress = data.features[0].properties.formatted;
+                                                        rtn(CurrentAddress);
+                                                    } catch (e) {
+                                                        rtn(`< Error ${e}>`);
+                                                    }
+                                                }else if(res.statusCode == 401){
+                                                    rtn("< API-Key not valid >");
+                                                }else {
+                                                    rtn(`< ErrorCode ${res.statusCode}>`);
+                                                }
+                                            }else if (config.geoAPI  === 'locationiq_eu'|| config.geoAPI === 'locationiq_usa') {
+                                                if (!err && res.statusCode == 200) {
+                                                    try {
+                                                        var CurrentAddress = data.display_name;
+                                                        rtn(CurrentAddress);
+                                                    } catch (e) {
+                                                        rtn(`< Error ${e}>`);
+                                                    }
+                                                }else if(res.statusCode == 401){
+                                                    rtn("< API-Key not valid >");
+                                                }else {
+                                                    rtn(`< ErrorCode ${res.statusCode}>`);
+                                                }
+                                            } else if (config.geoAPI === 'positionstack') {
+                                                if (!err && res.statusCode == 200) {
+                                                    try {
+                                                        var CurrentAddress = data.data[0].label; 
+                                                        rtn(CurrentAddress);
+                                                    } catch (e) {
+                                                        rtn(`< Error ${e}>`);
+                                                    }
+                                                }else if(res.statusCode == 401){
+                                                    rtn("< API-Key not valid >");
+                                                }else {
+                                                    rtn(`< ErrorCode ${res.statusCode}>`);
+                                                }
+                                            } else if (config.geoAPI  === 'tomtom') {
+                                                if (!err && res.statusCode == 200) {
+                                                    try {
+                                                        var CurrentAddress = data.addresses[0].address.freeformAddress;
+                                                        rtn(CurrentAddress);
+                                                    } catch (e) {
+                                                        rtn(`< Error ${e}>`);
+                                                    }
+                                                }else if(res.statusCode == 401){
+                                                    rtn("< API-Key not valid >");
+                                                }else {
+                                                    rtn(`< ErrorCode ${res.statusCode}>`);
+                                                }
+                                            }
+                                        });
+                                    });
                                     msg.payload[item][device].locationInfo.currentAddress = await crawledAddress;
 
 
@@ -337,8 +412,13 @@ module.exports = function(RED) {
                                                     node.debug('Get Elevation: ' + OpenEvaltionAPIUrl.url);
                                                     rtn("<Error: " + e + ">");
                                                 }
-                                            } else if (res.statusCode == 401) {
-                                                rtn("<No valid API-KEY for HereMaps>");
+                                            } else {
+                                                if (err){
+                                                    node.error('Error: ' + err);
+                                                }else{
+                                                    node.error(`Error HTTP-Request-Code: ${res.statusCode}`);
+                                                }
+                                                rtn("0");
                                             }
                                         });
                                     })
@@ -389,24 +469,19 @@ module.exports = function(RED) {
 
         this.on('input', async function(msg) {
             //Check if Apple ID and Password is not empty
-            if (this.credentials.appleid == "" || this.credentials.appleid == undefined || this.credentials.password == "" || this.credentials.password == undefined) {
-                node.status({ fill: "red", shape: "dot", text: "A valid Apple ID is required" });
+            if (this.credentials == null || this.credentials == undefined || this.credentials.appleid == undefined || this.credentials.appleid == ""  || this.credentials.password == "" || this.credentials.password == undefined) {
+                node.status({ fill: "red", shape: "dot", text: "A valid Apple-Account is required" });
             }
             //Checking if GeoAPI an API where need's a API-KEY
-            else if (config.geoAPI == "HERE" && config.hereMapApiKey == "") {
-                node.status({ fill: "red", shape: "dot", text: "HereMap API-Key is required" });
-            } else if (config.geoAPI == "GOOGLE" && config.googleMapsApiKey == "") {
-                node.status({ fill: "red", shape: "dot", text: "GoogleMaps API-Key is required" });
+            else if (config.geoAPI != "osm" && config.geoApiKey == "") {
+                node.status({ fill: "red", shape: "dot", text: "A API-Key for Geolocation is required" });
             } else {
                 node.status({});
-
                 //Define Authentication to Request Header
                 RequestHeader.Authorization = "Basic " + Buffer.from(this.credentials.appleid + ":" + this.credentials.password).toString('base64');
 
                 //Define Request Content
                 //var RequestContent = { "clientContext": { "appVersion": "7.0", "fmly": "" + this.credentials.showfmly + "" } };
-
-
 
                 var DeviceRequest = new Promise(rtn => {
                     urllib.request(RootURL + this.credentials.appleid + '/initClient', {
@@ -528,8 +603,11 @@ module.exports = function(RED) {
                 msg.payload = {};
 
                 node.status({ fill: "blue", shape: "dot", text: "Fetching Devices..." });
+
                 //Wait for Device-Request
                 var DeviceRequestResult = await DeviceRequest;
+
+                console.log(DeviceRequestResult);
 
                 if (DeviceRequestResult.status) {
                     msg.payload = DeviceRequestResult.data;
@@ -547,98 +625,197 @@ module.exports = function(RED) {
                                 } else {
 
                                     //Build Address-Crawl URL's
-                                    var AdressCheckUrlOSM = "https://nominatim.openstreetmap.org/reverse?format=json&accept-language=de-DE&lat=" + msg.payload[item][device].locationInfo.latitude + "&lon=" + msg.payload[item][device].locationInfo.longitude + "&zoom=18&addressdetails=1";
-                                    var AddressCheckUrlHereMap = "https://revgeocode.search.hereapi.com/v1/revgeocode?at=" + msg.payload[item][device].locationInfo.latitude.toFixed(6) + "," + msg.payload[item][device].locationInfo.longitude.toFixed(6) + "&apiKey=" + config.hereMapApiKey;
-                                    var AddressCheckUrlGoogleMaps = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + msg.payload[item][device].locationInfo.latitude + "," + msg.payload[item][device].locationInfo.longitude + "&language=de&key=" + config.googleMapsApiKey;
+                                    var GeolocationUrlArray = [
 
-
-                                    //Build OpenElevation-URL's
-                                    var ElevationUrlArray = 
-                                    [
-                                        {id:1, url:`https://api.smarthome-development.de/api/v1/get-elevation?locations=${msg.payload[item][device].locationInfo.l>atitude},${msg.payload[item][device].locationInfo.longitude}&format=json`},
-                                        {id:2, url:`https://api.opentopodata.org/v1/eudem25m?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}`},
-                                        {id:3, url:`https://api.open-elevation.com/api/v1/lookup?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}`}
+                                        {id:"osm", url:`https://nominatim.openstreetmap.org/reverse?format=json&accept-language=de-DE&lat=${msg.payload[item][device].locationInfo.latitude}&lon=${msg.payload[item][device].locationInfo.longitude}&zoom=18&addressdetails=1`},
+                                        {id:"here", url:`https://revgeocode.search.hereapi.com/v1/revgeocode?at=${msg.payload[item][device].locationInfo.latitude.toFixed(6)},${msg.payload[item][device].locationInfo.longitude.toFixed(6)}&apiKey=${config.geoApiKey}`},
+                                        {id:"bing", url:`https://dev.virtualearth.net/REST/v1/Locations/${msg.payload[item][device].locationInfo.latitude.toFixed(6)},${msg.payload[item][device].locationInfo.longitude.toFixed(6)}?incl=ciso2&inclnb=1&key=${config.geoApiKey}`},
+                                        {id:"google", url:`https://maps.googleapis.com/maps/api/geocode/json?latlng=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}&language=de&key=${config.geoApiKey}`},
+                                        {id:"geoapify", url:`https://api.geoapify.com/v1/geocode/reverse?lat=${msg.payload[item][device].locationInfo.latitude}&lon=${msg.payload[item][device].locationInfo.longitude}&apiKey=${config.geoApiKey}`},
+                                        {id:"locationiq_eu", url:`https://eu1.locationiq.com/v1/reverse?key=${config.geoApiKey}&lat=${msg.payload[item][device].locationInfo.latitude}&lon=${msg.payload[item][device].locationInfo.longitude}&format=json`},
+                                        {id:"locationiq_usa", url:`https://us1.locationiq.com/v1/reverse?key=${config.geoApiKey}&lat=${msg.payload[item][device].locationInfo.latitude}&lon=${msg.payload[item][device].locationInfo.longitude}&format=json`},
+                                        {id:"positionstack", url:`http://api.positionstack.com/v1/reverse?access_key=${config.geoApiKey}&query=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}&output=json&limit=1`},
+                                        {id:"tomtom", url:`https://api.tomtom.com/search/2/reverseGeocode/${msg.payload[item][device].locationInfo.latitude}%2C${msg.payload[item][device].locationInfo.longitude}?key=${config.geoApiKey}&ext=json`},
+                                        
                                     ];
 
+                                    //Build Elevation Address-Crawl URL's (We need multible Adresses to bypass Rate Limit or Error 429 )
+                                    var ElevationUrlArray = [
+                                        
+                                        {id:1, url:`https://api.smarthome-development.de/api/v1/get-elevation?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}&format=json`},
+                                        {id:2, url:`https://api.opentopodata.org/v1/eudem25m?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}`},
+                                        {id:3, url:`https://api.open-elevation.com/api/v1/lookup?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}`}
+                                    
+                                    ];
 
+                                    var OpenEvaltionAPIUrl = getRandomObject(ElevationUrlArray);
 
                                     //Crawl Address in Sub-Request
                                     var crawledAddress = new Promise(rtn => {
-                                        //Using HereMapAPI
-                                        if (config.geoAPI == "HERE") {
-                                            urllib.request(AddressCheckUrlHereMap, {
-                                                    method: 'GET',
-                                                    rejectUnauthorized: false,
-                                                    dataType: 'json',
-                                                    timeout: RED.nodes.getNode(config.account).timeout * 1000
-                                                },
-                                                function(err, data, res) {
-                                                    if (!err && res.statusCode == 200) {
-                                                        rtn(data.items[0].address);
-                                                    } else if (res.statusCode == 401) {
-                                                        rtn("<No valid API-KEY for HereMaps>");
-                                                    }
-                                                });
-                                        } else if (config.geoAPI == "OSM") {
-                                            //Using OpenStreetMap-API
-                                            urllib.request(AdressCheckUrlOSM, {
-                                                    method: 'GET',
-                                                    rejectUnauthorized: false,
-                                                    dataType: 'json',
-                                                    timeout: RED.nodes.getNode(config.account).timeout * 1000
-                                                },
-                                                function(err, data, res) {
-                                                    if (!err && res.statusCode == 200) {
-                                                        rtn(data.address);
-                                                    } else {
-                                                        rtn("<Error on OpenStreetMaps ErrorCode: " + res.satusCode + ">");
-                                                    }
-                                                });
-                                        } else if (config.geoAPI == "GOOGLE") {
-                                            //Using GoogleMaps-API
-                                            urllib.request(AddressCheckUrlGoogleMaps, {
-                                                    method: 'GET',
-                                                    rejectUnauthorized: false,
-                                                    dataType: 'json',
-                                                    timeout: RED.nodes.getNode(config.account).timeout * 1000
-                                                },
-                                                function(err, data, res) {
-                                                    if (!err && res.statusCode == 200) {
-                                                        if (data.status == "OK") {
-                                                            rtn({ "address_components": data.results[0].address_components, "formatted_address": data.results[0].formatted_address });
-                                                        } else {
-                                                            rtn("<Error: " + data.status + ">");
-                                                        }
+                                        var usedUrl = GeolocationUrlArray.find((item) => item.id == config.geoAPI);
 
+                                        urllib.request(usedUrl.url, {
+                                            method: 'GET',
+                                            rejectUnauthorized: false,
+                                            dataType: 'json',
+                                            timeout: RED.nodes.getNode(config.account).timeout * 1000
+                                        },
+                                        function(err, data, res) {
+                                            if (config.geoAPI === 'osm') {
+                                                if (!err && res.statusCode == 200) {
+                                                    var CurrentAddress = "";
+                                                    if (data.hasOwnProperty('address')) {
+                                                        var AddressObject = data.address;
+                                                        if (AddressObject.hasOwnProperty('road')) {
+                                                            CurrentAddress += AddressObject.road;
+                                                            if (AddressObject.hasOwnProperty('house_number')) {
+                                                                CurrentAddress += " " + AddressObject.house_number;
+                                                            } 
+                                                            CurrentAddress += ", ";
+                                                        }
+                                                        if (AddressObject.hasOwnProperty('postcode')) {
+                                                            CurrentAddress += AddressObject.postcode + " ";
+                                                        }
+                                                        if (AddressObject.hasOwnProperty('village')) {
+                                                            CurrentAddress += AddressObject.village;
+                                                        } else {
+                                                            if (AddressObject.hasOwnProperty('town')) {
+                                                                CurrentAddress += AddressObject.town;
+                                                            }
+                                                        }
+                                                    } else {
+                                                        CurrentAddress = "Response has no Address Object";
                                                     }
-                                                });
-                                        }
+                                                    rtn(CurrentAddress);
+                                                }else if(res.statusCode == 401){
+                                                    rtn("< API-Key not valid >");
+                                                }else {
+                                                    rtn(`< ErrorCode ${res.statusCode}>`);
+                                                }
+                                            }else if (config.geoAPI === 'bing') {
+                                                if (!err && res.statusCode == 200) {
+                                                    var CurrentAddress = data.resourceSets[0].resources[0].address.formattedAddress;
+                                                    rtn(CurrentAddress);
+                                                } else {
+                                                    if (res.statusCode == 401) {
+                                                        rtn("< No valid API-KEY >");
+                                                    }else{
+                                                        rtn(`< ErrorCode ${res.statusCode}>`);
+                                                    }
+                                                }
+                                            }else if (config.geoAPI  === 'here') {
+                                                if (!err && res.statusCode == 200) {
+                                                    try {
+                                                        var CurrentAddress = data.items[0].address.label;
+                                                        rtn(CurrentAddress);
+                                                    } catch (e) {
+                                                        rtn(`< Error ${e}>`);
+                                                    }
+                                                }else if(res.statusCode == 401){
+                                                    rtn("< API-Key not valid >");
+                                                }else {
+                                                    rtn(`< ErrorCode ${res.statusCode}>`);
+                                                }
+                                            }else if (config.geoAPI  === 'google') {
+                                                if (!err && res.statusCode == 200) {
+                                                    if (data.status == "OK") {
+                                                        var CurrentAddress = data.results[0].formatted_address;
+                                                        rtn(CurrentAddress);
+                                                    } else {
+                                                        rtn(`< Error ${data.status}>`);
+                                                    }
+                                                }else if(res.statusCode == 401){
+                                                    rtn("< API-Key not valid >");
+                                                }else {
+                                                    rtn(`< ErrorCode ${res.statusCode}>`);
+                                                }
+                                            }else if (config.geoAPI === 'geoapify') {
+                                                if (!err && res.statusCode == 200) {
+                                                    try {
+                                                        var CurrentAddress = data.features[0].properties.formatted;
+                                                        rtn(CurrentAddress);
+                                                    } catch (e) {
+                                                        rtn(`< Error ${e}>`);
+                                                    }
+                                                }else if(res.statusCode == 401){
+                                                    rtn("< API-Key not valid >");
+                                                }else {
+                                                    rtn(`< ErrorCode ${res.statusCode}>`);
+                                                }
+                                            }else if (config.geoAPI  === 'locationiq_eu'|| config.geoAPI === 'locationiq_usa') {
+                                                if (!err && res.statusCode == 200) {
+                                                    try {
+                                                        var CurrentAddress = data.display_name;
+                                                        rtn(CurrentAddress);
+                                                    } catch (e) {
+                                                        rtn(`< Error ${e}>`);
+                                                    }
+                                                }else if(res.statusCode == 401){
+                                                    rtn("< API-Key not valid >");
+                                                }else {
+                                                    rtn(`< ErrorCode ${res.statusCode}>`);
+                                                }
+                                            } else if (config.geoAPI === 'positionstack') {
+                                                if (!err && res.statusCode == 200) {
+                                                    try {
+                                                        var CurrentAddress = data.data[0].label; 
+                                                        rtn(CurrentAddress);
+                                                    } catch (e) {
+                                                        rtn(`< Error ${e}>`);
+                                                    }
+                                                }else if(res.statusCode == 401){
+                                                    rtn("< API-Key not valid >");
+                                                }else {
+                                                    rtn(`< ErrorCode ${res.statusCode}>`);
+                                                }
+                                            } else if (config.geoAPI  === 'tomtom') {
+                                                if (!err && res.statusCode == 200) {
+                                                    try {
+                                                        var CurrentAddress = data.addresses[0].address.freeformAddress;
+                                                        rtn(CurrentAddress);
+                                                    } catch (e) {
+                                                        rtn(`< Error ${e}>`);
+                                                    }
+                                                }else if(res.statusCode == 401){
+                                                    rtn("< API-Key not valid >");
+                                                }else {
+                                                    rtn(`< ErrorCode ${res.statusCode}>`);
+                                                }
+                                            }
+                                        });
                                     });
                                     msg.payload[item][device].locationInfo.currentAddress = await crawledAddress;
 
-                                    if(msg.payload[item][device].locationInfo.altitude = 0){
-                                        //Crawl Elevation in Sub-Request
-                                        var crawledElevation = new Promise(rtn => {
-                                            //Gets a random url to evade the rate limit
-                                            var OpenEvaltionAPIUrl = getRandomObject(ElevationUrlArray);
 
-                                            urllib.request(OpenEvaltionAPIUrl.url, {
-                                                method: 'GET',
-                                                rejectUnauthorized: false,
-                                                dataType: 'json',
-                                                timeout: RED.nodes.getNode(config.account).timeout * 1000
-                                            },
-                                            function(err, data, res) {
-                                                if (!err && res.statusCode == 200) {
-                                                    var AltValue = parseFloat(data.results[0].elevation.toFixed(2));
-                                                    rtn({ "value" : AltValue });
-                                                }else{
-                                                    rtn({ "value" : 0 });
+                                    //Crawl Elevevation
+                                    var crawledElevation = new Promise(rtn => {
+                                        urllib.request(OpenEvaltionAPIUrl.url, {
+                                            method: 'GET',
+                                            rejectUnauthorized: false,
+                                            dataType: 'json',
+                                            timeout: RED.nodes.getNode(config.account).timeout * 1000
+                                        },
+                                        function(err, data, res) {
+                                            if (!err && res.statusCode == 200) {
+                                                try {
+                                                    rtn(parseInt(data.results[0].elevation.toFixed(2)));
+                                                } catch (e) {
+                                                    node.error('Error: ' + e);
+                                                    node.debug('Get Elevation: ' + OpenEvaltionAPIUrl.url);
+                                                    rtn("<Error: " + e + ">");
                                                 }
-                                            });
+                                            } else {
+                                                if (err){
+                                                    node.error('Error: ' + err);
+                                                }else{
+                                                    node.error(`Error HTTP-Request-Code: ${res.statusCode}`);
+                                                }
+                                                rtn("0");
+                                            }
                                         });
-                                        msg.payload[item][device].locationInfo.altitude = await crawledElevation.value;
-                                    }
+                                    })
+                                    msg.payload[item][device].locationInfo.altitude = await crawledElevation;
+
                                 }
                             };
                         }

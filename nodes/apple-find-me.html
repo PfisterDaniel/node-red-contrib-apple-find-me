@@ -1,4 +1,4 @@
-<!-- Node apple-find-me-account -->
+<!-- Begin Node apple-find-me-account -->
 <script type="text/javascript">
     RED.nodes.registerType('apple-find-me-account', {
         category: 'config',
@@ -699,10 +699,11 @@
         <p><b>Info</b>: Family entries shows devices that you own in your family group as devices.</p>
     </div>-->
 </script>
+<!-- End Node apple-find-me-account -->
 
 
 
-<!-- Node apple-find-me-sendmessage -->
+<!-- Begin Node apple-find-me-sendmessage -->
 <script type="text/javascript">
     RED.nodes.registerType('apple-find-me-sendmessage', {
         category: 'Mobile',
@@ -791,9 +792,9 @@
 <script type="text/x-red" data-help-name="apple-find-me-sendmessage">
     <p>Sends a message to an iOS-Device</p>
 </script>
+<!-- End Node apple-find-me-sendmessage -->
 
-
-<!-- Node apple-find-me-playsound -->
+<!-- Begin Node apple-find-me-playsound -->
 <script type="text/javascript">
     RED.nodes.registerType('apple-find-me-playsound', {
         category: 'Mobile',
@@ -857,10 +858,10 @@
 <script type="text/x-red" data-help-name="apple-find-me-playsound">
     <p>Run Find my iPhone</p>
 </script>
+<!-- End Node apple-find-me-playsound -->
 
 
-
-<!-- Node apple-find-me -->
+<!-- Begin Node apple-find-me -->
 <script type="text/javascript">
     RED.nodes.registerType('apple-find-me', {
         category: 'Mobile',
@@ -878,16 +879,13 @@
                 value: "300000"
             },
             geoAPI: {
-                value: "OSM"
+                value: "osm"
             },
             distanceInMeter: {
                 value: 150,
                 validate: RED.validators.number()
             },
-            hereMapApiKey: {
-                value: ""
-            },
-            googleMapsApiKey: {
+            geoApiKey: {
                 value: ""
             },
             places: {
@@ -921,44 +919,85 @@
                 $("#valWarning").show();
             }
 
-            if (this.geoAPI == "HERE") {
-                $("#HereMapAPIKey").show();
-                $("#HereTips").show();
-                $("#GoogleTips").hide();
-                $("#GoogleMapsAPIKey").hide();
-
-            } else if (this.geoAPI == "GOOGLE") {
-                $("#HereMapAPIKey").hide();
-                $("#HereTips").hide();
-                $("#GoogleTips").show();
-                $("#GoogleMapsAPIKey").show();
-            } else {
-                $("#HereMapAPIKey").hide();
-                $("#GoogleMapsAPIKey").hide();
-                $("#HereTips").hide();
-                $("#GoogleTips").hide();
-            }
-
+            prepareApiKey(this.geoAPI);
+            
             $('#node-input-geoAPI').change(function() {
-                if (this.value == "HERE") {
-                    $("#HereMapAPIKey").show();
-                    $("#HereTips").show();
-                    $("#GoogleTips").hide();
-                    $("#GoogleMapsAPIKey").hide();
-
-                } else if (this.value == "GOOGLE") {
-                    $("#HereMapAPIKey").hide();
-                    $("#HereTips").hide();
-                    $("#GoogleTips").show();
-                    $("#GoogleMapsAPIKey").show();
-                } else {
-                    $("#HereMapAPIKey").hide();
-                    $("#GoogleMapsAPIKey").hide();
-                    $("#HereTips").hide();
-                    $("#GoogleTips").hide();
-                }
-
+                prepareApiKey($(this).val());
             });
+
+            function prepareApiKey(mapProvider){
+                switch (mapProvider) {
+                    case 'osm':
+                        $('#ApiKey').hide();
+                        $('#Tips').hide();
+                        break;
+                    case 'here':
+                        $('#Tips').show();
+                        $('#ApiKey').show();
+                        $('#TipsValue').html("You don't have an API KEY for <span id='TipsMapProvider'></span>? Then you can create one here: <a id='TipsLink' href='' target='_new'>Click</a>");
+                        $('#TipsMapProvider').text("HereMaps");
+                        $('#TipsLink').attr("href", "https://developer.here.com/");
+                        $('#TipsLink').attr("title", "Create API-KEY for Here-Maps");
+                        break;
+                    case 'bing':
+                        $('#Tips').show();
+                        $('#ApiKey').show();
+                        $('#TipsValue').html("You don't have an API KEY for <span id='TipsMapProvider'></span>? Then you can create one here: <a id='TipsLink' href='' target='_new'>Click</a>");
+                        $('#TipsMapProvider').text("BingMaps");
+                        $('#TipsLink').attr("href", "https://www.bingmapsportal.com/");
+                        $('#TipsLink').attr("title", "Create API-KEY for BingMaps");                   
+                        break;
+                    case 'google':
+                        $('#Tips').show();
+                        $('#ApiKey').show();
+                        $('#TipsValue').html("You don't have an API KEY for <span id='TipsMapProvider'></span>? Then you can create one here: <a id='TipsLink' href='' target='_new'>Click</a>");
+                        $('#TipsMapProvider').text("GoogleMaps");
+                        $('#TipsLink').attr("href", "https://developers.google.com/maps/documentation/javascript/get-api-key");
+                        $('#TipsLink').attr("title", "Create API-KEY for GoogleMaps");      
+                        break;
+                    case 'geoapify':
+                        $('#Tips').show();
+                        $('#ApiKey').show();
+                        $('#TipsValue').html("You don't have an API KEY for <span id='TipsMapProvider'></span>? Then you can create one here: <a id='TipsLink' href='' target='_new'>Click</a>");
+                        $('#TipsMapProvider').text("Geoapify");
+                        $('#TipsLink').attr("href", "https://www.geoapify.com");
+                        $('#TipsLink').attr("title", "Create API-KEY for Geoapify"); 
+                        break;
+                    case 'locationiq_eu':
+                        $('#Tips').show();
+                        $('#ApiKey').show();
+                        $('#TipsValue').html("You don't have an API KEY for <span id='TipsMapProvider'></span>? Then you can create one here: <a id='TipsLink' href='' target='_new'>Click</a>");
+                        $('#TipsMapProvider').text("LocationIQ");
+                        $('#TipsLink').attr("href", "https://locationiq.com");
+                        $('#TipsLink').attr("title", "Create API-KEY for LocationIQ"); 
+                        break;
+                    case 'locationiq_usa':
+                        $('#Tips').show();
+                        $('#ApiKey').show();
+                        $('#TipsValue').html("You don't have an API KEY for <span id='TipsMapProvider'></span>? Then you can create one here: <a id='TipsLink' href='' target='_new'>Click</a>");
+                        $('#TipsMapProvider').text("LocationIQ");
+                        $('#TipsLink').attr("href", "https://locationiq.com");
+                        $('#TipsLink').attr("title", "Create API-KEY for LocationIQ"); 
+                        break;
+                    case 'positionstack':
+                        $('#Tips').show();
+                        $('#ApiKey').show();
+                        $('#TipsValue').html("You don't have an API KEY for <span id='TipsMapProvider'></span>? Then you can create one here: <a id='TipsLink' href='' target='_new'>Click</a>");
+                        $('#TipsMapProvider').text("PositionStack");
+                        $('#TipsLink').attr("href", "https://positionstack.com");
+                        $('#TipsLink').attr("title", "Create API-KEY for PositionStack"); 
+                        break;
+                    case 'tomtom':
+                        $('#Tips').show();
+                        $('#ApiKey').show();
+                        $('#TipsValue').html("You don't have an API KEY for <span id='TipsMapProvider'></span>? Then you can create one here: <a id='TipsLink' href='' target='_new'>Click</a>");
+                        $('#TipsMapProvider').text("TomTom-Developer-API");
+                        $('#TipsLink').attr("href", "https://developer.tomtom.com/store/maps-api");
+                        $('#TipsLink').attr("title", "Create API-KEY for TomTom-Developer-API"); 
+                        break;
+                    default:
+                }
+            }
 
             function generatePlace(i, place) {
                 var container = $('<li/>', {
@@ -1069,20 +1108,22 @@
     <div class="form-row">
         <label for="node-input-geoAPI" style=""><i class="fa fa-map-signs"></i> Geo-API:</label>
         <select id="node-input-geoAPI" style="width:70%;">
-            <option value="OSM">OpenStreetMap</option>
-            <option value="HERE">HereMaps</option>
-            <option value="GOOGLE">GoogleMaps</option>
+            <option value="osm">OpenStreetMap</option>
+            <option value="here">HereMaps</option>
+            <option value="google">GoogleMaps</option>
+            <option value="bing">BingMaps</option>
+            <option value="geoapify">Geoapify</option>
+            <option value="locationiq_eu">LocationIQ (EU)</option>
+            <option value="locationiq_usa">LocationIQ (USA)</option>
+            <option value="positionstack">Positionstack</option>
+            <option value="tomtom">TomTom</option>
         </select>
     </div>
-    <div class="form-row" id="HereMapAPIKey">
-        <label for="node-input-hereMapApiKey" style="text-align:right;"><i class="fa fa-key"></i> API-Key:</label>
-        <input type="password" id="node-input-hereMapApiKey" placeholder="HereMaps API-Key">
-    </div>
 
-    <div class="form-row" id="GoogleMapsAPIKey">
-        <label for="node-input-googleMapsApiKey" style="text-align:right;"><i class="fa fa-key"></i> API-Key:</label>
-        <input type="password" id="node-input-googleMapsApiKey" placeholder="GoogleMaps API-Key">
-    </div>
+    <div class="form-row" id="ApiKey">
+        <label for="node-input-geoApiKey" style="text-align:right;"><i class="fa fa-unlock-alt"></i> API-Key:</label>
+        <input type="password" id="node-input-geoApiKey" placeholder="API-Key">
+    </div>    
 
     <div class="form-row">
         <label for="node-input-triggerInterval" style="width:auto"><i class="fa fa-clock-o"></i> Trigger Interval:</label>
@@ -1110,19 +1151,21 @@
         <input type="text" id="node-input-distanceInMeter">
     </div>
     <br/>
-    <div class="form-tips" id="HereTips">
-        <p>You don't have an API KEY for HereMaps? Then you can create one here: <a href="https://developer.here.com/" target="_new">Click</a></p>
+
+  
+    <div class="form-tips" id="Tips">
+        <p id="TipsValue"></p>
     </div>
-    <div class="form-tips" id="GoogleTips">
-        <p>You don't have an API KEY for GoogleMaps? Then you can create one here: <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_new">Click</a></p>
-    </div>
+
+
 </script>
 
 <script type="text/x-red" data-help-name="apple-find-me">
     <p>Finds all iOS devices in your Apple account and calls up the parameters based on the set interval.</p>
 </script>
+<!-- End Node apple-find-me -->
 
-<!-- Node apple-find-me-with-payload -->
+<!-- Begin Node apple-find-me-with-payload -->
 <script type="text/javascript">
     RED.nodes.registerType('apple-find-me-with-payload', {
         category: 'Mobile',
@@ -1137,16 +1180,13 @@
                 value: ""
             },
             geoAPI: {
-                value: "OSM"
+                value: "osm"
             },
             distanceInMeter: {
                 value: 150,
                 validate: RED.validators.number()
             },
-            hereMapApiKey: {
-                value: ""
-            },
-            googleMapsApiKey: {
+            geoApiKey: {
                 value: ""
             },
             places: {
@@ -1179,45 +1219,85 @@
             } else {
                 $("#valWarning").show();
             }
-
-            if (this.geoAPI == "HERE") {
-                $("#HereMapAPIKey").show();
-                $("#HereTips").show();
-                $("#GoogleTips").hide();
-                $("#GoogleMapsAPIKey").hide();
-
-            } else if (this.geoAPI == "GOOGLE") {
-                $("#HereMapAPIKey").hide();
-                $("#HereTips").hide();
-                $("#GoogleTips").show();
-                $("#GoogleMapsAPIKey").show();
-            } else {
-                $("#HereMapAPIKey").hide();
-                $("#GoogleMapsAPIKey").hide();
-                $("#HereTips").hide();
-                $("#GoogleTips").hide();
+            prepareApiKey(this.geoAPI);
+            
+            $('#node-input-geoAPI').change(function() {
+                prepareApiKey($(this).val());
+            });
+            function prepareApiKey(mapProvider){
+                switch (mapProvider) {
+                    case 'osm':
+                        $('#ApiKey').hide();
+                        $('#Tips').hide();
+                        break;
+                    case 'here':
+                        $('#Tips').show();
+                        $('#ApiKey').show();
+                        $('#TipsValue').html("You don't have an API KEY for <span id='TipsMapProvider'></span>? Then you can create one here: <a id='TipsLink' href='' target='_new'>Click</a>");
+                        $('#TipsMapProvider').text("HereMaps");
+                        $('#TipsLink').attr("href", "https://developer.here.com/");
+                        $('#TipsLink').attr("title", "Create API-KEY for Here-Maps");
+                        break;
+                    case 'bing':
+                        $('#Tips').show();
+                        $('#ApiKey').show();
+                        $('#TipsValue').html("You don't have an API KEY for <span id='TipsMapProvider'></span>? Then you can create one here: <a id='TipsLink' href='' target='_new'>Click</a>");
+                        $('#TipsMapProvider').text("BingMaps");
+                        $('#TipsLink').attr("href", "https://www.bingmapsportal.com/");
+                        $('#TipsLink').attr("title", "Create API-KEY for BingMaps");                   
+                        break;
+                    case 'google':
+                        $('#Tips').show();
+                        $('#ApiKey').show();
+                        $('#TipsValue').html("You don't have an API KEY for <span id='TipsMapProvider'></span>? Then you can create one here: <a id='TipsLink' href='' target='_new'>Click</a>");
+                        $('#TipsMapProvider').text("GoogleMaps");
+                        $('#TipsLink').attr("href", "https://developers.google.com/maps/documentation/javascript/get-api-key");
+                        $('#TipsLink').attr("title", "Create API-KEY for GoogleMaps");      
+                        break;
+                    case 'geoapify':
+                        $('#Tips').show();
+                        $('#ApiKey').show();
+                        $('#TipsValue').html("You don't have an API KEY for <span id='TipsMapProvider'></span>? Then you can create one here: <a id='TipsLink' href='' target='_new'>Click</a>");
+                        $('#TipsMapProvider').text("Geoapify");
+                        $('#TipsLink').attr("href", "https://www.geoapify.com");
+                        $('#TipsLink').attr("title", "Create API-KEY for Geoapify"); 
+                        break;
+                    case 'locationiq_eu':
+                        $('#Tips').show();
+                        $('#ApiKey').show();
+                        $('#TipsValue').html("You don't have an API KEY for <span id='TipsMapProvider'></span>? Then you can create one here: <a id='TipsLink' href='' target='_new'>Click</a>");
+                        $('#TipsMapProvider').text("LocationIQ");
+                        $('#TipsLink').attr("href", "https://locationiq.com");
+                        $('#TipsLink').attr("title", "Create API-KEY for LocationIQ"); 
+                        break;
+                    case 'locationiq_usa':
+                        $('#Tips').show();
+                        $('#ApiKey').show();
+                        $('#TipsValue').html("You don't have an API KEY for <span id='TipsMapProvider'></span>? Then you can create one here: <a id='TipsLink' href='' target='_new'>Click</a>");
+                        $('#TipsMapProvider').text("LocationIQ");
+                        $('#TipsLink').attr("href", "https://locationiq.com");
+                        $('#TipsLink').attr("title", "Create API-KEY for LocationIQ"); 
+                        break;
+                    case 'positionstack':
+                        $('#Tips').show();
+                        $('#ApiKey').show();
+                        $('#TipsValue').html("You don't have an API KEY for <span id='TipsMapProvider'></span>? Then you can create one here: <a id='TipsLink' href='' target='_new'>Click</a>");
+                        $('#TipsMapProvider').text("PositionStack");
+                        $('#TipsLink').attr("href", "https://positionstack.com");
+                        $('#TipsLink').attr("title", "Create API-KEY for PositionStack"); 
+                        break;
+                    case 'tomtom':
+                        $('#Tips').show();
+                        $('#ApiKey').show();
+                        $('#TipsValue').html("You don't have an API KEY for <span id='TipsMapProvider'></span>? Then you can create one here: <a id='TipsLink' href='' target='_new'>Click</a>");
+                        $('#TipsMapProvider').text("TomTom-Developer-API");
+                        $('#TipsLink').attr("href", "https://developer.tomtom.com/store/maps-api");
+                        $('#TipsLink').attr("title", "Create API-KEY for TomTom-Developer-API"); 
+                        break;
+                    default:
+                }
             }
 
-            $('#node-input-geoAPI').change(function() {
-                if (this.value == "HERE") {
-                    $("#HereMapAPIKey").show();
-                    $("#HereTips").show();
-                    $("#GoogleTips").hide();
-                    $("#GoogleMapsAPIKey").hide();
-
-                } else if (this.value == "GOOGLE") {
-                    $("#HereMapAPIKey").hide();
-                    $("#HereTips").hide();
-                    $("#GoogleTips").show();
-                    $("#GoogleMapsAPIKey").show();
-                } else {
-                    $("#HereMapAPIKey").hide();
-                    $("#GoogleMapsAPIKey").hide();
-                    $("#HereTips").hide();
-                    $("#GoogleTips").hide();
-                }
-
-            });
 
             function generatePlace(i, place) {
                 var container = $('<li/>', {
@@ -1328,20 +1408,22 @@
     <div class="form-row">
         <label for="node-input-geoAPI" style=""><i class="fa fa-map-signs"></i> Geo-API:</label>
         <select id="node-input-geoAPI" style="width:70%;">
-            <option value="OSM">OpenStreetMap</option>
-            <option value="HERE">HereMaps</option>
-            <option value="GOOGLE">GoogleMaps</option>
+            <option value="osm">OpenStreetMap</option>
+            <option value="here">HereMaps</option>
+            <option value="google">GoogleMaps</option>
+            <option value="bing">BingMaps</option>
+            <option value="geoapify">Geoapify</option>
+            <option value="locationiq_eu">LocationIQ (EU)</option>
+            <option value="locationiq_usa">LocationIQ (USA)</option>
+            <option value="positionstack">Positionstack</option>
+            <option value="tomtom">TomTom</option>
         </select>
     </div>
-    <div class="form-row" id="HereMapAPIKey">
-        <label for="node-input-hereMapApiKey" style="text-align:right;"><i class="fa fa-key"></i> API-Key:</label>
-        <input type="password" id="node-input-hereMapApiKey" placeholder="HereMaps API-Key">
-    </div>
 
-    <div class="form-row" id="GoogleMapsAPIKey">
-        <label for="node-input-googleMapsApiKey" style="text-align:right;"><i class="fa fa-key"></i> API-Key:</label>
-        <input type="password" id="node-input-googleMapsApiKey" placeholder="GoogleMaps API-Key">
-    </div>
+    <div class="form-row" id="ApiKey">
+        <label for="node-input-geoApiKey" style="text-align:right;"><i class="fa fa-unlock-alt"></i> API-Key:</label>
+        <input type="password" id="node-input-geoApiKey" placeholder="API-Key">
+    </div>    
 
     <div class="form-row node-input-places-container-row" style="margin-bottom: 0px;width: 100%">
         <label for="node-input-width" style="vertical-align:top"><i class="fa fa-map-marker"></i> Places</label>
@@ -1358,14 +1440,12 @@
         <input type="text" id="node-input-distanceInMeter">
     </div>
     <br/>
-    <div class="form-tips" id="HereTips">
-        <p>You don't have an API KEY for HereMaps? Then you can create one here: <a href="https://developer.here.com/" target="_new">Click</a></p>
-    </div>
-    <div class="form-tips" id="GoogleTips">
-        <p>You don't have an API KEY for GoogleMaps? Then you can create one here: <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_new">Click</a></p>
+    <div class="form-tips" id="Tips">
+        <p id="TipsValue"></p>
     </div>
 </script>
 
 <script type="text/x-red" data-help-name="apple-find-me-with-payload">
     <p>Finds all iOS devices in your Apple account and only calls up the parameters if there is an input.</p>
 </script>
+<!-- End Node apple-find-me-with-payload -->
