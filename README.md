@@ -117,13 +117,22 @@ Update:
              "batteryLevel":"<BatteryLevel in percent> e.g 53",
              "batteryState":"<BatteryStatus> e.g: CHARGING",
              "locationInfo":{
+                "distances": [
+                    {
+                      "name": "HOME",
+                      "distance_in_meter": <Distance in meter> e.g 200,
+                      "distance_in_km": <Distance in kilometer> e.g 0.2,
+                      "distance_in_miles": <Distance in miles> e.g 0.3
+                    }
+                  ]
+                },
                 "altitude":0,
                 "latitude":0.00000000000,
                 "longitude":0.00000000000,
                 "isInaccurate":false,
                 "isOld":false,
                 "positionType":"Wifi or GPS",
-                "horizontalAccuracy":"<Accuracy in meters> e.g: 65,
+                "horizontalAccuracy": "<Accuracy in meters> e.g: 65",
                 "verticalAccuracy":0,
                 "currentPlace":"<if device in place then its here the name of place when distance < 150 meters>",
                 "currentAddress":{<Address-Object from OpenStreetMap, HereMap or GoogleMaps>},
@@ -159,7 +168,8 @@ Update:
 | 1.1.3 | Bug fixed: [Issue #22](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues/22) |
 | 1.1.4 | [Issue #23](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues/23) |
 | 1.1.5 | Bug fixed: Problem with Package.json in 1.1.4 |
-| 1.1.7 | Bug fix and add new Geolocation-Provider (BingMaps, Geoapify, LocationIQ, Positionstack, Tomtom)  |
+| 1.1.7 | Bug fix and add new Geolocation-Provider (BingMaps, Geoapify, LocationIQ, Positionstack, Tomtom) |
+| 1.1.8 | Bug fix and add distances (remove slow Elevation API [Issue #27](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues/27)) |
 
 ## Bugs and feature requests
 Please create an issue in [GitHub](https://github.com/PfisterDaniel/node-red-contrib-apple-find-me/issues)

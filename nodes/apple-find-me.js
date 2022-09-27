@@ -140,6 +140,8 @@ module.exports = function(RED) {
                                         devices[entry.modelDisplayName].push(NewDeviceEntryWithoutLocationInfo);
                                     } else {
                                         var CurrentPlace = "";
+                                        var Distances = [];
+
                                         //Check if Places are set
                                         if (config.places.length > 0) {
                                             var LocationsWithDistance = [];
@@ -148,20 +150,26 @@ module.exports = function(RED) {
                                             for (var i = 0; i < config.places.length; i++) {
                                                 var distanceObj = {
                                                     "name": config.places[i].name,
-                                                    "distance": 0
+                                                    "distance_in_meter": 0,
+                                                    "distance_in_km": 0,
+                                                    "distance_in_miles": 0
                                                 }
                                                 var LocationCoordinates = new GeoPoint(parseFloat(config.places[i].lat), parseFloat(config.places[i].lon));
-                                                distanceObj.distance = parseInt((currentLocation.distanceTo(LocationCoordinates, true) * 1000).toString().split(".")[0]);
+                                                distanceObj.distance_in_meter = parseInt((currentLocation.distanceTo(LocationCoordinates, true) * 1000).toString().split(".")[0]);
+                                                distanceObj.distance_in_km = parseFloat((currentLocation.distanceTo(LocationCoordinates, true)).toFixed(2));
+                                                distanceObj.distance_in_miles = parseFloat(((currentLocation.distanceTo(LocationCoordinates, true) * 1000 ) / 1609).toFixed(2));
                                                 LocationsWithDistance.push(distanceObj);
+                                                Distances.push(distanceObj);
                                             }
 
-                                            const smallestDistanceValue = LocationsWithDistance.reduce((acc, loc) => acc.distance < loc.distance ? acc : loc);
-                                            if (smallestDistanceValue.distance < config.distanceInMeter) {
+                                            const smallestDistanceValue = LocationsWithDistance.reduce((acc, loc) => acc.distance_in_meter < loc.distance_in_meter ? acc : loc);
+                                            if (smallestDistanceValue.distance_in_meter < config.distanceInMeter) {
                                                 CurrentPlace = smallestDistanceValue.name;
                                             } else {
                                                 CurrentPlace = "UNKNOWN";
                                             }
                                         } else {
+                                            Distances = "<NO PLACES DEFINDED>";
                                             CurrentPlace = "<NO PLACES DEFINDED>";
                                         }
 
@@ -179,6 +187,7 @@ module.exports = function(RED) {
                                             "batteryLevel": Math.round(entry.batteryLevel * 100),
                                             "batteryState": entry.batteryStatus,
                                             "locationInfo": {
+                                                "distances": Distances,
                                                 "altitude": entry.location.altitude,
                                                 "latitude": entry.location.latitude,
                                                 "longitude": entry.location.longitude,
@@ -250,9 +259,8 @@ module.exports = function(RED) {
                                     //Build Elevation Address-Crawl URL's (We need multible Adresses to bypass Rate Limit or Error 429 )
                                     var ElevationUrlArray = [
                                         
-                                        {id:1, url:`https://api.smarthome-development.de/api/v1/get-elevation?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}&format=json`},
-                                        {id:2, url:`https://api.opentopodata.org/v1/eudem25m?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}`},
-                                        {id:3, url:`https://api.open-elevation.com/api/v1/lookup?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}`}
+                                        {id:1, url:`https://api.opentopodata.org/v1/eudem25m?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}`},
+                                        {id:2, url:`https://api.open-elevation.com/api/v1/lookup?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}`}
                                     
                                     ];
 
@@ -532,6 +540,8 @@ module.exports = function(RED) {
                                         devices[entry.modelDisplayName].push(NewDeviceEntryWithoutLocationInfo);
                                     } else {
                                         var CurrentPlace = "";
+                                        var Distances = [];
+
                                         //Check if Places are set
                                         if (config.places.length > 0) {
                                             var LocationsWithDistance = [];
@@ -540,20 +550,26 @@ module.exports = function(RED) {
                                             for (var i = 0; i < config.places.length; i++) {
                                                 var distanceObj = {
                                                     "name": config.places[i].name,
-                                                    "distance": 0
+                                                    "distance_in_meter": 0,
+                                                    "distance_in_km": 0,
+                                                    "distance_in_miles": 0
                                                 }
                                                 var LocationCoordinates = new GeoPoint(parseFloat(config.places[i].lat), parseFloat(config.places[i].lon));
-                                                distanceObj.distance = parseInt((currentLocation.distanceTo(LocationCoordinates, true) * 1000).toString().split(".")[0]);
+                                                distanceObj.distance_in_meter = parseInt((currentLocation.distanceTo(LocationCoordinates, true) * 1000).toString().split(".")[0]);
+                                                distanceObj.distance_in_km = parseFloat((currentLocation.distanceTo(LocationCoordinates, true)).toFixed(2));
+                                                distanceObj.distance_in_miles = parseFloat(((currentLocation.distanceTo(LocationCoordinates, true) * 1000 ) / 1609).toFixed(2));
                                                 LocationsWithDistance.push(distanceObj);
+                                                Distances.push(distanceObj);
                                             }
 
-                                            const smallestDistanceValue = LocationsWithDistance.reduce((acc, loc) => acc.distance < loc.distance ? acc : loc);
-                                            if (smallestDistanceValue.distance < config.distanceInMeter) {
+                                            const smallestDistanceValue = LocationsWithDistance.reduce((acc, loc) => acc.distance_in_meter < loc.distance_in_meter ? acc : loc);
+                                            if (smallestDistanceValue.distance_in_meter < config.distanceInMeter) {
                                                 CurrentPlace = smallestDistanceValue.name;
                                             } else {
                                                 CurrentPlace = "UNKNOWN";
                                             }
                                         } else {
+                                            Distances = "<NO PLACES DEFINDED>";
                                             CurrentPlace = "<NO PLACES DEFINDED>";
                                         }
 
@@ -571,6 +587,7 @@ module.exports = function(RED) {
                                             "batteryLevel": Math.round(entry.batteryLevel * 100),
                                             "batteryState": entry.batteryStatus,
                                             "locationInfo": {
+                                                "distances": Distances,
                                                 "altitude": entry.location.altitude,
                                                 "latitude": entry.location.latitude,
                                                 "longitude": entry.location.longitude,
@@ -642,9 +659,8 @@ module.exports = function(RED) {
                                     //Build Elevation Address-Crawl URL's (We need multible Adresses to bypass Rate Limit or Error 429 )
                                     var ElevationUrlArray = [
                                         
-                                        {id:1, url:`https://api.smarthome-development.de/api/v1/get-elevation?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}&format=json`},
-                                        {id:2, url:`https://api.opentopodata.org/v1/eudem25m?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}`},
-                                        {id:3, url:`https://api.open-elevation.com/api/v1/lookup?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}`}
+                                        {id:1, url:`https://api.opentopodata.org/v1/eudem25m?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}`},
+                                        {id:2, url:`https://api.open-elevation.com/api/v1/lookup?locations=${msg.payload[item][device].locationInfo.latitude},${msg.payload[item][device].locationInfo.longitude}`}
                                     
                                     ];
 
