@@ -6,6 +6,10 @@ It work's without 2-Factor-Authentication (2FA) and retrive all connected device
 Important: Family-Devices are not longer working!
 
 ## Donation:
+You can buy me a coffee or two if you find helpfull my node.
+
+If you buy me a coffee I would like to thank you in advance for your donation.
+
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg?style=flat&logo=PayPal)](https://www.paypal.com/donate/?hosted_button_id=NF8XH8AMXZV2J)
 
 
